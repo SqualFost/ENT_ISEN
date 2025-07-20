@@ -10,7 +10,7 @@ Il s’appuie sur une API existante (celle actuellement utilisée par l’ENT of
 ## 🛠️ Technologies utilisées
 
 - ⚡ [Next.js](https://nextjs.org/)
-- 💄 [ShadCN/UI](https://ui.shadcn.dev/) (Radix UI + Tailwind)
+- 💄 [ShadCN/UI](https://ui.shadcn.com/) (Radix UI + Tailwind)
 - 🌐 API officielle de l’ENT ISEN (non développée ici)
 
 ## 📚 Fonctionnalités
