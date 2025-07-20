@@ -3,7 +3,7 @@ import CardConteneur from "@/components/CardConteneur";
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col lg:flex-row lg:h-screen bg-gray-50 p-4 gap-4">
+    <div className="flex flex-col lg:flex-row lg:h-screen p-4 gap-4">
       {/* Navbar verticale */}
       <NavBar />
 

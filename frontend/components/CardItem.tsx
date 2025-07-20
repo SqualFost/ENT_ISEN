@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useState } from "react";
 import { X } from "lucide-react";
+import { CardItemProps } from "@/data";
 
 export default function CardItem({
   children,
