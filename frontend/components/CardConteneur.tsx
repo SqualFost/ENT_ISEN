@@ -22,7 +22,6 @@ export default function CardConteneur() {
                 {note.score}
               </Badge>
             </div>
-
             {/* Ajouter un Separator sauf après le dernier élément */}
             {index < notes.length - 1 && <Separator className="my-2" />}
           </div>
@@ -54,7 +53,6 @@ export default function CardConteneur() {
               </p>
             </div>
           </div>
-
           <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
             <Calendar size={16} className="text-blue-500 mt-0.5" />
             <div>
@@ -64,7 +62,6 @@ export default function CardConteneur() {
               </p>
             </div>
           </div>
-
           <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
             <CheckCircle size={16} className="text-green-500 mt-0.5" />
             <div>
@@ -112,21 +109,18 @@ export default function CardConteneur() {
                 <p className="text-gray-800">28/09/2023 - 05/07/2024</p>
               </div>
             </div>
-
             <div>
               <span className="font-medium text-gray-600 text-xs">
                 Intitulé:
               </span>
               <p className="text-gray-800 text-xs">Pôle Dev</p>
             </div>
-
             <div>
               <span className="font-medium text-gray-600 text-xs">
                 ER Référent:
               </span>
               <p className="text-gray-800 text-xs">CRAPE Amaury</p>
             </div>
-
             <div className="flex items-center justify-between pt-2 border-t">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-medium text-gray-600">
@@ -153,144 +147,244 @@ export default function CardConteneur() {
       {/* Card EDT */}
       <CardItem
         className="col-span-1 md:col-span-2 row-span-3"
-        title="Emploi du temps"
-      >
-        <div className="space-y-3">
-          {/* En-têtes */}
-          <div className="grid grid-cols-6 gap-2 text-xs font-semibold">
-            <div className="text-zinc-600 text-center py-2 bg-zinc-300 rounded">
-              Horaires
+        title="Planning du jour"
+        contenuEtendu={
+          <div className="space-y-4">
+            {/* Version complète - toute la semaine */}
+            <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>Semaine du DD - DD MOIS YYYY</strong> • Semestre N
+              </p>
             </div>
-            <div className="text-zinc-100 text-center py-2 bg-zinc-400 rounded">
-              Lundi
+
+            {/* En-têtes */}
+            <div className="grid grid-cols-6 gap-3 text-sm font-semibold">
+              <div className="text-zinc-600 text-center py-3 bg-zinc-300 rounded">
+                Horaires
+              </div>
+              <div className="text-zinc-100 text-center py-3 bg-zinc-400 rounded">
+                Lundi
+              </div>
+              <div className="text-zinc-600 text-center py-3 bg-zinc-300 rounded">
+                Mardi
+              </div>
+              <div className="text-zinc-100 text-center py-3 bg-zinc-400 rounded">
+                Mercredi
+              </div>
+              <div className="text-zinc-600 text-center py-3 bg-zinc-300 rounded">
+                Jeudi
+              </div>
+              <div className="text-zinc-100 text-center py-3 bg-zinc-400 rounded">
+                Vendredi
+              </div>
             </div>
-            <div className="text-zinc-600 text-center py-2 bg-zinc-300 rounded">
-              Mardi
-            </div>
-            <div className="text-zinc-100 text-center py-2 bg-zinc-400 rounded">
-              Mercredi
-            </div>
-            <div className="text-zinc-600 text-center py-2 bg-zinc-300 rounded">
-              Jeudi
-            </div>
-            <div className="text-zinc-100 text-center py-2 bg-zinc-400 rounded">
-              Vendredi
+
+            {/* Contenu complet */}
+            <div className="grid grid-cols-6 gap-3 text-sm">
+              {/* Colonne Horaires */}
+              <div className="bg-zinc-300 rounded p-3 space-y-4">
+                <div className="font-medium text-zinc-700 py-2 text-center border-b border-zinc-400">
+                  8h-10h
+                </div>
+                <div className="font-medium text-zinc-700 py-2 text-center border-b border-zinc-400">
+                  10h-12h
+                </div>
+                <div className="font-medium text-zinc-700 py-2 text-center border-b border-zinc-400">
+                  12h-13h
+                </div>
+                <div className="font-medium text-zinc-700 py-2 text-center border-b border-zinc-400">
+                  13h-14h
+                </div>
+                <div className="font-medium text-zinc-700 py-2 text-center border-b border-zinc-400">
+                  14h-16h
+                </div>
+                <div className="font-medium text-zinc-700 py-2 text-center">
+                  16h-18h
+                </div>
+              </div>
+
+              {/* Colonne Lundi */}
+              <div className="bg-zinc-400 rounded p-3 space-y-4">
+                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
+                  Algorithmie
+                </div>
+                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
+                  Sciences humaines
+                </div>
+                <div className="text-zinc-700 text-center py-2 italic">
+                  Pause
+                </div>
+                <div className="text-zinc-700 text-center py-2">-</div>
+                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
+                  Informatique
+                </div>
+                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
+                  Informatique
+                </div>
+              </div>
+
+              {/* Colonne Mardi */}
+              <div className="bg-zinc-300 rounded p-3 space-y-4">
+                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
+                  Sécurité web
+                </div>
+                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
+                  Web dev
+                </div>
+                <div className="text-zinc-700 text-center py-2 italic">
+                  Pause
+                </div>
+                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
+                  Espagnol
+                </div>
+                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
+                  Électronique
+                </div>
+                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
+                  Mathématiques
+                </div>
+              </div>
+
+              {/* Colonne Mercredi */}
+              <div className="bg-zinc-400 rounded p-3 space-y-4">
+                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
+                  Physique
+                </div>
+                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
+                  Algorithmie
+                </div>
+                <div className="text-zinc-700 text-center py-2 italic">
+                  Pause
+                </div>
+                <div className="text-zinc-700 text-center py-2">-</div>
+                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
+                  TP Info
+                </div>
+                <div className="text-zinc-700 text-center py-2">-</div>
+              </div>
+
+              {/* Colonne Jeudi */}
+              <div className="bg-zinc-300 rounded p-3 space-y-4">
+                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
+                  Projet info
+                </div>
+                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
+                  Projet info
+                </div>
+                <div className="text-zinc-700 text-center py-2 italic">
+                  Pause
+                </div>
+                <div className="text-zinc-700 text-center py-2">-</div>
+                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
+                  Anglais
+                </div>
+                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
+                  Sciences humaines
+                </div>
+              </div>
+
+              {/* Colonne Vendredi */}
+              <div className="bg-zinc-400 rounded p-3 space-y-4">
+                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
+                  Mathématiques
+                </div>
+                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
+                  TP Électronique
+                </div>
+                <div className="text-zinc-700 text-center py-2 italic">
+                  Pause
+                </div>
+                <div className="text-zinc-700 text-center py-2">-</div>
+                <div className="text-zinc-700 text-center py-2">-</div>
+                <div className="text-zinc-700 text-center py-2">-</div>
+              </div>
             </div>
           </div>
-
-          {/* Contenu */}
-          <div className="grid grid-cols-6 gap-2 text-xs h-64">
-            {/* Colonne Horaires */}
-            <div className="bg-zinc-300 rounded p-2 space-y-2">
-              <div className="font-medium text-zinc-700 py-1">8h-10h</div>
-              <div className="font-medium text-zinc-700 py-1">10h-12h</div>
-              <div className="font-medium text-zinc-700 py-1">12h-13h</div>
-              <div className="font-medium text-zinc-700 py-1">13h-14h</div>
-              <div className="font-medium text-zinc-700 py-1">14h-16h</div>
-              <div className="font-medium text-zinc-700 py-1">16h-18h</div>
-            </div>
-
-            {/* Colonne Lundi */}
-            <div className="bg-zinc-400 rounded p-2 space-y-2">
-              <div className="bg-zinc-300 text-zinc-700 p-1 rounded text-center">
-                Algorithmie
+        }
+      >
+        {/* Version condensée - jour actuel seulement */}
+        <div>
+          {/* Planning du jour */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-3 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
+              <div className="text-xs font-medium text-blue-600 w-16">
+                8h-10h
               </div>
-              <div className="bg-zinc-300 text-zinc-700 p-1 rounded text-center">
-                Sciences humaines
-              </div>
-              <div className="text-zinc-700 text-center py-1">Pause</div>
-              <div className="text-gray-400 text-zinc-700 text-center py-1">
-                -
-              </div>
-              <div className="bg-zinc-300 text-zinc-700 p-1 rounded text-center">
-                Informatique
-              </div>
-              <div className="bg-zinc-300 text-zinc-700 p-1 rounded text-center">
-                Informatique
+              <div className="flex-1">
+                <p className="text-sm font-medium text-blue-800">
+                  Sécurité web
+                </p>
+                <p className="text-xs text-blue-600">Salle 321</p>
               </div>
             </div>
 
-            {/* Colonne Mardi */}
-            <div className="bg-zinc-300 rounded p-2 space-y-2">
-              <div className="bg-zinc-400 text-zinc-100 p-1 rounded text-center">
-                Sécurité web
+            <div className="flex items-center gap-3 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
+              <div className="text-xs font-medium text-blue-600 w-16">
+                10h-12h
               </div>
-              <div className="bg-zinc-400 text-zinc-100 p-1 rounded text-center">
-                Web dev
-              </div>
-              <div className="text-zinc-100 text-center py-1">Pause</div>
-              <div className="bg-zinc-400 text-zinc-100 p-1 rounded text-center">
-                Espagnol
-              </div>
-              <div className="bg-zinc-400 text-zinc-100 p-1 rounded text-center">
-                Électronique
-              </div>
-              <div className="bg-zinc-400 text-zinc-100 p-1 rounded text-center">
-                Mathématiques
+              <div className="flex-1">
+                <p className="text-sm font-medium text-blue-800">Web dev</p>
+                <p className="text-xs text-blue-600">Salle 320</p>
               </div>
             </div>
 
-            {/* Colonne Mercredi */}
-            <div className="bg-zinc-400 rounded p-2 space-y-2">
-              <div className="bg-zinc-300 text-zinc-700 p-1 rounded text-center">
-                Physique
+            <div className="flex items-center gap-3 p-2 bg-gray-50 rounded border-l-4 border-gray-300">
+              <div className="text-xs font-medium text-gray-500 w-16">
+                12h-13h
               </div>
-              <div className="bg-zinc-300 text-zinc-700 p-1 rounded text-center">
-                Algorithmie
-              </div>
-              <div className="text-zinc-700 text-center py-1">Pause</div>
-              <div className="text-zinc-700 text-center py-1">-</div>
-              <div className="bg-zinc-300 text-zinc-700 text-green-800 p-1 rounded text-center">
-                TP Info
-              </div>
-              <div className="text-zinc-700 text-center py-1">-</div>
-            </div>
-
-            {/* Colonne Jeudi */}
-            <div className="bg-zinc-300 rounded p-2 space-y-2">
-              <div className="bg-zinc-400 text-zinc-100 p-1 rounded text-center">
-                Projet info
-              </div>
-              <div className="bg-zinc-400 text-zinc-100 p-1 rounded text-center">
-                Projet info
-              </div>
-              <div className="text-zinc-100 text-center py-1">Pause</div>
-              <div className="text-zinc-100 text-center py-1">-</div>
-              <div className="bg-zinc-400 text-zinc-100 p-1 rounded text-center">
-                Anglais
-              </div>
-              <div className="bg-zinc-400 text-zinc-100 p-1 rounded text-center">
-                Sciences humaines
+              <div className="flex-1">
+                <p className="text-sm text-gray-600 italic">Pause déjeuner</p>
               </div>
             </div>
 
-            {/* Colonne Vendredi */}
-            <div className="bg-zinc-400 rounded p-2 space-y-2">
-              <div className="bg-zinc-300 text-zinc-700 p-1 rounded text-center">
-                Mathématiques
+            <div className="flex items-center gap-3 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
+              <div className="text-xs font-medium text-blue-600 w-16">
+                13h-14h
               </div>
-              <div className="bg-zinc-300 text-zinc-700 p-1 rounded text-center">
-                TP Électronique
+              <div className="flex-1">
+                <p className="text-sm font-medium text-blue-800">Espagnol</p>
+                <p className="text-xs text-blue-600">Salle 110</p>
               </div>
-              <div className="text-zinc-700 text-center py-1">Pause</div>
-              <div className="text-zinc-700 text-center py-1">-</div>
-              <div className="text-zinc-700 text-center py-1">-</div>
-              <div className="text-zinc-700 text-center py-1">-</div>
+            </div>
+
+            <div className="flex items-center gap-3 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
+              <div className="text-xs font-medium text-blue-600 w-16">
+                14h-16h
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-blue-800">
+                  Électronique
+                </p>
+                <p className="text-xs text-blue-600">Salle 520</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
+              <div className="text-xs font-medium text-blue-600 w-16">
+                16h-18h
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-blue-800">
+                  Mathématiques
+                </p>
+                <p className="text-xs text-blue-600">Salle 521</p>
+              </div>
             </div>
           </div>
         </div>
       </CardItem>
 
       {/* Card Absences/Retards */}
-      <CardItem className="col-span-1 row-span-2" title="Présence">
+      <CardItem
+        className="lg:col-span-1 md:col-span-2 col-span-1 row-span-2"
+        title="Présence"
+      >
         <div className="space-y-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-green-600">94%</div>
             <p className="text-xs text-gray-500">Taux de présence</p>
           </div>
-
           <Separator />
-
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
               <span className="text-gray-600">Absences justifiées</span>
@@ -305,7 +399,6 @@ export default function CardConteneur() {
               <span className="font-medium">3</span>
             </div>
           </div>
-
           <div className="bg-red-50 p-2 rounded border-l-4 border-red-400">
             <div className="flex items-center gap-2">
               <Clock size={12} className="text-red-500" />
