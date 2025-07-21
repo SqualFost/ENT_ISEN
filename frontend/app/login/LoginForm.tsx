@@ -34,7 +34,7 @@ export default function LoginForm() {
       const response = await api.login(username, password);
       Cookies.set("token", response, {
         expires: 3600,
-        secure: true,
+        secure: false, // Mettre à true en production
         sameSite: "lax",
       });
       router.push("/"); // Redirection vers la page d'accueil après connexion réussie

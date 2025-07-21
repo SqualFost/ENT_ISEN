@@ -6,7 +6,6 @@ class ISEN_Api {
       Accept: "text/plain",
       Token: null,
     };
-    this.token = null;
   }
   async fetchData(endpoint) {
     try {
@@ -37,13 +36,15 @@ class ISEN_Api {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.text();
-      this.token = data;
-      this.headers.Token = this.token;
+      this.setToken(data);
       return data;
     } catch (error) {
       console.error("Error logging in:", error);
       throw error;
     }
+  }
+  async setToken(token) {
+    this.headers.Token = token;
   }
   async getAbscences() {
     return this.fetchData("absences");
@@ -58,13 +59,15 @@ class ISEN_Api {
     if (end !== 0) {
       return this.fetchData(`agenda?end=${end}`);
     }
-    return this.fetchData("agenda");
+    const response = await this.fetchData("agenda");
+    console.log("response:", response);
+    return response;
   }
   async getEventById(id) {
     return this.fetchData(`agenda/event/${id}`);
   }
   async getNotations() {
-    return this.fetchData("notations");
+    return await this.fetchData("notations");
   }
   async getUserClassNotations() {
     return this.fetchData("notations/class");

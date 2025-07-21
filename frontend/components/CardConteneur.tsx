@@ -4,6 +4,7 @@ import CardItem from "@/components/CardItem";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import Cookies from "js-cookie";
 import {
   CircleCheckBig,
   Ban,
@@ -24,12 +25,20 @@ import {
 import ISEN_Api from "@/app/api/api";
 import { use, useEffect, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
+
 type Note = {
   sujet: string;
   score: number;
 };
-const api = new ISEN_Api();
 
+type Presence = {
+  absencesJustifiees: number;
+  absencesNonJustifiees: number;
+  retards: number;
+  derniereAbsence: { date: string; cours: string; justifiee: boolean }[];
+};
+const api = new ISEN_Api();
+api.setToken(Cookies.get("token"));
 const notifications = [
   {
     icon: <AlertCircle size={16} className="text-red-500 mt-0.5" />,
@@ -70,23 +79,72 @@ async function loadNotation() {
     console.error("Failed to load notation data:", error);
     return [];
   }
-
 }
+
+async function loadAbscences() {
+  try {
+    const response = await api.getAbscences();
+    console.log("Absences fetched:", response);
+    const derniereAbsence = response[0];
+    let justifie = [];
+    let nonJustifie = [];
+    for (const absence of response) {
+      if (absence.reason == "Absence non excusée") {
+        nonJustifie.push(absence);
+      }
+      else {
+        justifie.push(absence);
+      }
+    }
+    const PresenceDetails: Presence = {
+      absencesJustifiees: justifie.length,
+      absencesNonJustifiees: nonJustifie.length,
+      retards: 0, // Assuming no retards data available
+      derniereAbsence: [
+        {
+          date: derniereAbsence.date,
+          cours: derniereAbsence.subject,
+          justifiee: derniereAbsence.reason !== "Absence non excusée",
+        },
+      ],
+    };
+    return PresenceDetails;
+  } catch (error) {
+    console.error("Failed to load absence data:", error);
+    return null;
+  }
+}
+
 export default function CardConteneur() {
   const [notes, setNotes] = useState<Note[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingNotes, setLoadingNotes] = useState(true);
   useEffect(() => {
     const fetchNotes = async () => {
       const result = await loadNotation();
       setNotes(result);
-      setLoading(false);
+      setLoadingNotes(false);
     };
     fetchNotes();
   }, []);
+
+  const [loadingAbcences, setLoadingAbcences] = useState(true);
+  const [PresenceDetails, setAbsences] = useState<Presence | null>(null);
+  useEffect(() => {
+    const fetchAbsences = async () => {
+      const result = await loadAbscences();
+      if (result) {
+        setAbsences(result);
+        setLoadingAbcences(false);
+      }
+
+    };
+    fetchAbsences();
+  }, []);
   return (
     <>
+      {/* Card Notes Récentes */}
       <CardItem className="col-span-1" title="Notes Récentes">
-        {loading ? (
+        {loadingNotes ? (
           <div className="space-y-2">
             {[...Array(3)].map((_, index) => (
               <div key={index} className="flex justify-between items-center">
@@ -433,46 +491,63 @@ export default function CardConteneur() {
         className="lg:col-span-1 md:col-span-2 col-span-1 row-span-2"
         title="Présence"
       >
-        <div className="space-y-4">
+        {loadingAbcences || !PresenceDetails ? (
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-800">Absences justifiées</span>
-              <span className="font-medium text-gray-800">
-                {PresenceDetails.absencesJustifiees}
-              </span>
+            {[...Array(3)].map((_, index) => (
+              <div key={index} className="flex justify-between items-center">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-4 w-12 rounded-md" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-800">Absences justifiées</span>
+                <span className="font-medium text-gray-800">
+                  {PresenceDetails.absencesJustifiees}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-800">Absences non justifiées</span>
+                <span className="font-medium text-destructive">
+                  {PresenceDetails.absencesNonJustifiees}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-800">Retards</span>
+                <span className="font-medium text-gray-800">
+                  {PresenceDetails.retards}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-800">Absences non justifiées</span>
-              <span className="font-medium text-destructive">
-                {PresenceDetails.absencesNonJustifiees}
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-800">Retards</span>
-              <span className="font-medium text-gray-800">
-                {PresenceDetails.retards}
-              </span>
+            <Separator />
+            <div
+              className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}
+            >
+              <div className="flex items-center gap-2">
+                <Clock size={12} className={classes.icon} />
+                <span className={`text-xs ${classes.textMain}`}>
+                  Dernière absence:{" "}
+                  {PresenceDetails.derniereAbsence.length > 0
+                    ? PresenceDetails.derniereAbsence[0].date
+                    : "—"}
+                </span>
+              </div>
+              <p className={`text-xs mt-1 ${classes.textSub}`}>
+                {PresenceDetails.derniereAbsence.length > 0
+                  ? `${PresenceDetails.derniereAbsence[0].cours} – ${PresenceDetails.derniereAbsence[0].justifiee
+                    ? "Justifiée"
+                    : "Non justifiée"
+                  }`
+                  : "Aucune absence"}
+              </p>
             </div>
           </div>
-          <Separator />
-          <div
-            className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}
-          >
-            <div className="flex items-center gap-2">
-              <Clock size={12} className={classes.icon} />
-              <span className={`text-xs ${classes.textMain}`}>
-                Dernière absence: {PresenceDetails.derniereAbsence[0].date}
-              </span>
-            </div>
-            <p className={`text-xs mt-1 ${classes.textSub}`}>
-              {PresenceDetails.derniereAbsence[0].cours} –{" "}
-              {PresenceDetails.derniereAbsence[0].justifiee
-                ? "Justifiée"
-                : "Non justifiée"}
-            </p>
-          </div>
-        </div>
+        )}
       </CardItem>
+
     </>
   );
 }
