@@ -14,17 +14,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { User, Lock, Loader2 } from "lucide-react";
 import ISEN_Api from "@/app/api/api.js";
-import { useRouter } from 'next/navigation';
-
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 export default function LoginForm() {
-  
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [error, setError] = useState("");
-  
 
   // simulation de login attendant que l'api marche et que l'ent soit pas cassé encore
   const handleSubmit = async (event: React.FormEvent) => {
@@ -34,7 +32,12 @@ export default function LoginForm() {
     try {
       // Appel à l'API pour la connexion
       const response = await api.login(username, password);
-      router.push('/'); // Redirection vers la page d'accueil après connexion réussie
+      Cookies.set("token", response, {
+        expires: 3600,
+        secure: true,
+        sameSite: "lax",
+      });
+      router.push("/"); // Redirection vers la page d'accueil après connexion réussie
     } catch (error) {
       console.error("Erreur lors de la connexion:", error);
       setError("Nom d'utilisateur ou mot de passe incorrect.");
@@ -128,6 +131,12 @@ export default function LoginForm() {
                 "Se connecter"
               )}
             </Button>
+            {/* Affichage des erreurs */}
+            {error && (
+              <div className="text-red-500 text-sm mt-2 text-center">
+                {error}
+              </div>
+            )}
           </form>
         </CardContent>
       </Card>
