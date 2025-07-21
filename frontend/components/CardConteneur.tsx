@@ -1,3 +1,5 @@
+"use client";
+
 import CardItem from "@/components/CardItem";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -19,6 +21,14 @@ import {
   classes,
   notifColors,
 } from "@/data";
+import ISEN_Api from "@/app/api/api";
+import { use, useEffect, useState } from "react";
+import { Skeleton } from "./ui/skeleton";
+type Note = {
+  sujet: string;
+  score: number;
+};
+const api = new ISEN_Api();
 
 const notifications = [
   {
@@ -40,23 +50,64 @@ const notifications = [
     color: "green",
   },
 ];
+async function loadNotation() {
+  try {
+    const response = await api.getNotations();
+    let notes = []
+    let i = 0
+    for (const note of response) {
+      notes.push(note)
+      i++;
+      if (i >= 3) break; // Limiter à 3 notes
+    }
+    console.log("Notes fetched:", notes);
+    notes = notes.map(note => ({
+      sujet: note.name.split(" - ")[1],
+      score: note.note,
+    }));
+    return notes;
+  } catch (error) {
+    console.error("Failed to load notation data:", error);
+    return [];
+  }
 
+}
 export default function CardConteneur() {
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchNotes = async () => {
+      const result = await loadNotation();
+      setNotes(result);
+      setLoading(false);
+    };
+    fetchNotes();
+  }, []);
   return (
     <>
       <CardItem className="col-span-1" title="Notes Récentes">
-        {notes.map((note, index) => (
-          <div key={index}>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-sm text-gray-800">{note.sujet}</span>
-              <Badge variant="secondary" className="bg-gray-100 text-black">
-                {note.score}
-              </Badge>
-            </div>
-            {/* Ajouter un Separator sauf après le dernier élément */}
-            {index < notes.length - 1 && <Separator className="my-2" />}
+        {loading ? (
+          <div className="space-y-2">
+            {[...Array(3)].map((_, index) => (
+              <div key={index} className="flex justify-between items-center">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-4 w-12 rounded-md" />
+              </div>
+            ))}
           </div>
-        ))}
+        ) : (
+          notes.map((note, index) => (
+            <div key={index}>
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-sm text-gray-800">{note.sujet}</span>
+                <Badge variant="secondary" className="bg-gray-100 text-black">
+                  {note.score}
+                </Badge>
+              </div>
+              {index < notes.length - 1 && <Separator className="my-2" />}
+            </div>
+          ))
+        )}
       </CardItem>
 
       {/* Card Moyenne */}
@@ -348,16 +399,14 @@ export default function CardConteneur() {
           {planning.map((item, index) => (
             <div
               key={index}
-              className={`flex items-center gap-3 p-2 rounded border-l-4 ${
-                item.isPause
-                  ? "bg-gray-50 border-gray-300"
-                  : "bg-blue-50 border-blue-400"
-              }`}
+              className={`flex items-center gap-3 p-2 rounded border-l-4 ${item.isPause
+                ? "bg-gray-50 border-gray-300"
+                : "bg-blue-50 border-blue-400"
+                }`}
             >
               <div
-                className={`text-xs font-medium w-16 ${
-                  item.isPause ? "text-gray-500" : "text-blue-600"
-                }`}
+                className={`text-xs font-medium w-16 ${item.isPause ? "text-gray-500" : "text-blue-600"
+                  }`}
               >
                 {item.heure}
               </div>
