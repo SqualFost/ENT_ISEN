@@ -13,21 +13,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { User, Lock, Loader2 } from "lucide-react";
+import ISEN_Api from "@/app/api/api.js";
+import { useRouter } from 'next/navigation';
+
 
 export default function LoginForm() {
+  
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const [error, setError] = useState("");
+  
 
   // simulation de login attendant que l'api marche et que l'ent soit pas cassé encore
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
-
-    setTimeout(() => {
+    const api = new ISEN_Api();
+    try {
+      // Appel à l'API pour la connexion
+      const response = await api.login(username, password);
+      router.push('/'); // Redirection vers la page d'accueil après connexion réussie
+    } catch (error) {
+      console.error("Erreur lors de la connexion:", error);
+      setError("Nom d'utilisateur ou mot de passe incorrect.");
+    } finally {
       setIsLoading(false);
-      console.log("Connexion avec:", { username, password });
-    }, 2000);
+    }
   };
 
   return (

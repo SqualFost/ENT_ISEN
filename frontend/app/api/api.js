@@ -23,7 +23,7 @@ class ISEN_Api {
       throw error;
     }
   }
-  async LogIn(username, password) {
+  async login(username, password) {
     try {
       const response = await fetch(this.baseUrl + "token", {
         method: "POST",
