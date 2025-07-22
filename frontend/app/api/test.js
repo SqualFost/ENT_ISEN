@@ -1,28 +1,20 @@
-import ISEN_Api from "./api.js";
+// Aujourd’hui à 00h00:00.000
+const now = new Date();
 
-const api = new ISEN_Api();
+const startOfDay = new Date(
+  now.getFullYear(),
+  now.getMonth(),
+  now.getDate(),
+  0, 0, 0, 0
+).getTime();
 
-async function run() {
-  try {
-    // Étape 1 : Login
-    const token = await api.login("matteo.sautron", "AGWEJD");
-    console.log(":white_check_mark: Token reçu :", token);
+// Aujourd’hui à 23h59:59.999
+const endOfDay = new Date(
+  now.getFullYear(),
+  now.getMonth(),
+  now.getDate(),
+  23, 59, 59, 999
+).getTime();
 
-    // Étape 2 : Appels aux méthodes
-    const absences = await api.getAbscences();
-    console.log(":pushpin: Absences :", absences);
-
-    const userInfo = await api.getUserInfo();
-    console.log(":bust_in_silhouette: Infos utilisateur :", userInfo);
-
-    const agenda = await api.getAgenda();
-    console.log(":date: Agenda :", agenda);
-
-    const notations = await api.getNotations();
-    console.log(":pencil: Notes :", notations);
-  } catch (err) {
-    console.error(":x: Une erreur est survenue :", err);
-  }
-}
-
-run();
+console.log("startOfDay:", startOfDay);
+console.log("endOfDay:", endOfDay);
