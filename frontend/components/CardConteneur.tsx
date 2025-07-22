@@ -14,37 +14,18 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  notes,
+  Cours,
+  Note,
+  Presence,
   evenements,
   ERDetails,
-  planning,
-  PresenceDetails,
   classes,
-  notifColors,
 } from "@/data";
 import ISEN_Api from "@/app/api/api";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
-import { title } from "process";
 
-type Note = {
-  sujet: string;
-  score: number;
-};
-type Cours = {
-  heure: string;
-  cours: string;
-  salle: string | null;
-  isPause?: boolean;
-  isExam: boolean;
-}
 
-type Presence = {
-  absencesJustifiees: number;
-  absencesNonJustifiees: number;
-  retards: number;
-  derniereAbsence: { date: string; cours: string; justifiee: boolean }[];
-};
 const api = new ISEN_Api();
 api.setToken(Cookies.get("token"));
 const notifications = [

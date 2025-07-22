@@ -6,7 +6,24 @@ export interface CardItemProps {
   children?: React.ReactNode;
   contenuEtendu?: React.ReactNode;
 }
+export type Note = {
+  sujet: string;
+  score: number;
+};
+export type Cours = {
+  heure: string;
+  cours: string;
+  salle: string | null;
+  isPause?: boolean;
+  isExam: boolean;
+}
 
+export type Presence = {
+  absencesJustifiees: number;
+  absencesNonJustifiees: number;
+  retards: number;
+  derniereAbsence: { date: string; cours: string; justifiee: boolean }[];
+};
 // Data provisioires
 
 export const notes = [
