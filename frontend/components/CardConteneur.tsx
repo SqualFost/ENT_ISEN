@@ -25,11 +25,19 @@ import {
 import ISEN_Api from "@/app/api/api";
 import { use, useEffect, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
+import { title } from "process";
 
 type Note = {
   sujet: string;
   score: number;
 };
+type Cours = {
+  heure: string;
+  cours: string;
+  salle: string | null;
+  isPause?: boolean;
+  isExam: boolean;
+}
 
 type Presence = {
   absencesJustifiees: number;
@@ -114,6 +122,39 @@ async function loadAbscences() {
     return null;
   }
 }
+async function loadEDT() {
+  try {
+    const response = await api.getAgenda(1730764800000, 1730851199000);
+    console.log("EDT fetched:", response);
+    const planning: Cours[] = [];
+    for (const item of response) {
+      const title = item.title.split(" - ");
+      if (title.length === 11) {
+        planning.push({
+          heure: title[0] + "-" + title[1],
+          cours: title[2] + " " + title[3],
+          salle: title[6],
+          isPause: false,
+          isExam: item.className === "est-epreuve" ? true : false,
+        });
+      }
+      else {
+        planning.push({
+          heure: title[0] + "-" + title[1],
+          cours: title[2],
+          salle: title[5],
+          isPause: false,
+          isExam: item.className === "est-epreuve" ? true : false,
+        });
+      }
+
+    }
+    return planning;
+  } catch (error) {
+    console.error("Failed to load EDT data:", error);
+    return [];
+  }
+}
 
 export default function CardConteneur() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -136,9 +177,21 @@ export default function CardConteneur() {
         setAbsences(result);
         setLoadingAbcences(false);
       }
-
     };
     fetchAbsences();
+  }, []);
+
+  const [loadingEDT, setLoadingEDT] = useState(true);
+  const [planning, setPlanning] = useState<Cours[]>([]);
+  useEffect(() => {
+    const fetchEDT = async () => {
+      const result = await loadEDT();
+      if (result) {
+        setPlanning(result);
+        setLoadingEDT(false);
+      }
+    };
+    fetchEDT();
   }, []);
   return (
     <>
