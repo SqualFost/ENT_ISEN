@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardHeader,
@@ -12,7 +14,11 @@ import {
   Tickets,
   File,
   User,
+  LogOut,
 } from "lucide-react";
+import Cookies from "js-cookie";
+import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
 
 const liens = [
   { icon: CircleUser, label: "Mon compte", href: "#" },
@@ -24,6 +30,11 @@ const liens = [
 ];
 
 export default function Navbar() {
+  const router = useRouter();
+  const handleLogout = () => {
+    Cookies.remove("token"); // Supprimer le cookie
+    router.push("/login"); // Redirection vers la page de connexion
+  };
   return (
     <Card className="w-64 flex flex-col h-full max-h-screen">
       <CardHeader className="border-b">
@@ -61,6 +72,14 @@ export default function Navbar() {
             <p className="text-sm font-medium">Etudiant Genial</p>
             <p className="text-xs text-slate-700">etudiant@genial.com</p>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="text-red-500 hover:text-red-700 flex items-center cursor-pointer"
+          >
+            <LogOut size={16} className="mr-1" />
+          </Button>
         </div>
       </CardFooter>
     </Card>
