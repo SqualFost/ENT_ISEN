@@ -78,8 +78,8 @@ async function loadAbscences() {
     const response = await api.getAbscences();
     console.log("Absences fetched:", response);
     const derniereAbsence = response[0];
-    let justifie = [];
-    let nonJustifie = [];
+    const justifie = [];
+    const nonJustifie = [];
     for (const absence of response) {
       if (absence.reason == "Absence non excusée") {
         nonJustifie.push(absence);
