@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
 import {
   Card,
@@ -53,7 +52,7 @@ export default function LoginForm() {
           <div>
             <h1 className="text-3xl font-bold text-gray-800">ISEN Toulon</h1>
             <p className="text-sm text-gray-600">
-              L'école des ingénieurs du numérique
+              L&apos;école des ingénieurs du numérique
             </p>
           </div>
         </div>
@@ -63,8 +62,8 @@ export default function LoginForm() {
         <CardHeader className="text-center pb-4">
           <h2 className="text-2xl font-bold text-gray-800">Se connecter</h2>
           <CardDescription className="text-gray-600">
-            Veuillez entrer vos identifiants pour accéder à l'Espace Numérique
-            de Travail
+            Veuillez entrer vos identifiants pour accéder à l&apos;Espace
+            Numérique de Travail
           </CardDescription>
         </CardHeader>
 
@@ -76,7 +75,7 @@ export default function LoginForm() {
                 htmlFor="username"
                 className="text-sm font-medium text-gray-700"
               >
-                Nom d'utilisateur
+                Nom d&apos;utilisateur
               </Label>
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -131,12 +130,6 @@ export default function LoginForm() {
                 "Se connecter"
               )}
             </Button>
-            {/* Affichage des erreurs */}
-            {error && (
-              <div className="text-red-500 text-sm mt-2 text-center">
-                {error}
-              </div>
-            )}
           </form>
         </CardContent>
       </Card>
