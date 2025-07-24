@@ -4,7 +4,8 @@ import CardItem from "@/components/CardItem";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import Cookies from "js-cookie";
+import { formatDate } from "@/lib/utils";
+
 import {
   CircleCheckBig,
   Ban,
@@ -54,7 +55,7 @@ export default function CardConteneur() {
   useEffect(() => {
     const fetchNotes = async () => {
       const result = await loadNotation();
-      setNotes(result);
+      setNotes(result || []);
       setLoadingNotes(false);
     };
     fetchNotes();
@@ -65,10 +66,8 @@ export default function CardConteneur() {
   useEffect(() => {
     const fetchAbsences = async () => {
       const result = await loadAbscences();
-      if (result) {
-        setAbsences(result);
-        setLoadingAbcences(false);
-      }
+      setAbsences(result || null);
+      setLoadingAbcences(false);
     };
     fetchAbsences();
   }, []);
@@ -78,10 +77,10 @@ export default function CardConteneur() {
   useEffect(() => {
     const fetchEDT = async () => {
       const result = await loadEDT();
-      if (result) {
-        setPlanning(result);
-        setLoadingEDT(false);
-      }
+
+      setPlanning(result || []);
+      setLoadingEDT(false);
+
     };
     fetchEDT();
   }, []);
@@ -97,6 +96,18 @@ export default function CardConteneur() {
                 <Skeleton className="h-4 w-12 rounded-md" />
               </div>
             ))}
+          </div>
+        ) : notes.length === 0 ? (
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              Pas de notes récentes
+            </div>
+          </div>
+        ) : notes[0].isError ? (
+          <div className="space-y-2">
+            <div className="flex justify-between items-center" style={{ color: 'red' }}>
+              Erreur API
+            </div>
           </div>
         ) : (
           notes.map((note, index) => (
@@ -242,162 +253,37 @@ export default function CardConteneur() {
       {/* Card EDT */}
       <CardItem
         className="col-span-1 md:col-span-2 row-span-3"
-        title="Planning du jour"
-        contenuEtendu={
-          <div className="space-y-4">
-            {/* Version complète - toute la semaine */}
-            <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>Semaine du DD - DD MOIS YYYY</strong> • Semestre N
-              </p>
-            </div>
-
-            {/* En-têtes */}
-            <div className="grid grid-cols-6 gap-3 text-sm font-semibold">
-              <div className="text-zinc-600 text-center py-3 bg-zinc-300 rounded">
-                Horaires
-              </div>
-              <div className="text-zinc-100 text-center py-3 bg-zinc-400 rounded">
-                Lundi
-              </div>
-              <div className="text-zinc-600 text-center py-3 bg-zinc-300 rounded">
-                Mardi
-              </div>
-              <div className="text-zinc-100 text-center py-3 bg-zinc-400 rounded">
-                Mercredi
-              </div>
-              <div className="text-zinc-600 text-center py-3 bg-zinc-300 rounded">
-                Jeudi
-              </div>
-              <div className="text-zinc-100 text-center py-3 bg-zinc-400 rounded">
-                Vendredi
-              </div>
-            </div>
-
-            {/* Contenu complet */}
-            <div className="grid grid-cols-6 gap-3 text-sm">
-              {/* Colonne Horaires */}
-              <div className="bg-zinc-300 rounded p-3 space-y-4">
-                <div className="font-medium text-zinc-700 py-2 text-center border-b border-zinc-400">
-                  8h-10h
-                </div>
-                <div className="font-medium text-zinc-700 py-2 text-center border-b border-zinc-400">
-                  10h-12h
-                </div>
-                <div className="font-medium text-zinc-700 py-2 text-center border-b border-zinc-400">
-                  12h-13h
-                </div>
-                <div className="font-medium text-zinc-700 py-2 text-center border-b border-zinc-400">
-                  13h-14h
-                </div>
-                <div className="font-medium text-zinc-700 py-2 text-center border-b border-zinc-400">
-                  14h-16h
-                </div>
-                <div className="font-medium text-zinc-700 py-2 text-center">
-                  16h-18h
-                </div>
-              </div>
-
-              {/* Colonne Lundi */}
-              <div className="bg-zinc-400 rounded p-3 space-y-4">
-                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
-                  Algorithmie
-                </div>
-                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
-                  Sciences humaines
-                </div>
-                <div className="text-zinc-700 text-center py-2 italic">
-                  Pause
-                </div>
-                <div className="text-zinc-700 text-center py-2">-</div>
-                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
-                  Informatique
-                </div>
-                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
-                  Informatique
-                </div>
-              </div>
-
-              {/* Colonne Mardi */}
-              <div className="bg-zinc-300 rounded p-3 space-y-4">
-                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
-                  Sécurité web
-                </div>
-                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
-                  Web dev
-                </div>
-                <div className="text-zinc-700 text-center py-2 italic">
-                  Pause
-                </div>
-                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
-                  Espagnol
-                </div>
-                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
-                  Électronique
-                </div>
-                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
-                  Mathématiques
-                </div>
-              </div>
-
-              {/* Colonne Mercredi */}
-              <div className="bg-zinc-400 rounded p-3 space-y-4">
-                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
-                  Physique
-                </div>
-                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
-                  Algorithmie
-                </div>
-                <div className="text-zinc-700 text-center py-2 italic">
-                  Pause
-                </div>
-                <div className="text-zinc-700 text-center py-2">-</div>
-                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
-                  TP Info
-                </div>
-                <div className="text-zinc-700 text-center py-2">-</div>
-              </div>
-
-              {/* Colonne Jeudi */}
-              <div className="bg-zinc-300 rounded p-3 space-y-4">
-                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
-                  Projet info
-                </div>
-                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
-                  Projet info
-                </div>
-                <div className="text-zinc-700 text-center py-2 italic">
-                  Pause
-                </div>
-                <div className="text-zinc-700 text-center py-2">-</div>
-                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
-                  Anglais
-                </div>
-                <div className="bg-zinc-400 text-zinc-100 p-2 rounded text-center font-medium">
-                  Sciences humaines
-                </div>
-              </div>
-
-              {/* Colonne Vendredi */}
-              <div className="bg-zinc-400 rounded p-3 space-y-4">
-                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
-                  Mathématiques
-                </div>
-                <div className="bg-zinc-300 text-zinc-700 p-2 rounded text-center font-medium">
-                  TP Électronique
-                </div>
-                <div className="text-zinc-700 text-center py-2 italic">
-                  Pause
-                </div>
-                <div className="text-zinc-700 text-center py-2">-</div>
-                <div className="text-zinc-700 text-center py-2">-</div>
-                <div className="text-zinc-700 text-center py-2">-</div>
-              </div>
-            </div>
-          </div>
-        }
+        title={`Planning du ${formatDate(Date.now())}`}
       >
-        {/* Version condensée - jour actuel seulement */}
+      {/* Version condensée - jour actuel seulement */}
+      {loadingEDT ? (
+        <div className="space-y-1">
+          {[...Array(6)].map((_, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3 p-2 rounded border-l-4 bg-blue-50 border-blue-400"
+            >
+              <Skeleton className="h-4 w-16 rounded" />
+              <div className="flex-1">
+                <Skeleton className="h-4 w-32 mb-1 rounded" />
+                <Skeleton className="h-3 w-20 rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : planning.length === 0 ? (
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            Pas de planning disponible aujourd'hui
+          </div>
+        </div>
+      ) : planning[0].isError ? (
+        <div className="space-y-2">
+          <div className="flex justify-between items-center" style={{ color: 'red' }}>
+            Erreur API
+          </div>
+        </div>
+      ) : (
         <div className="space-y-1">
           {planning.map((item, index) => (
             <div
@@ -413,7 +299,6 @@ export default function CardConteneur() {
               >
                 {item.heure}
               </div>
-
               <div className="flex-1">
                 {item.isPause ? (
                   <p className="text-sm text-gray-600 italic">{item.cours}</p>
@@ -429,69 +314,100 @@ export default function CardConteneur() {
             </div>
           ))}
         </div>
-      </CardItem>
+      )}
+    </CardItem >
 
-      {/* Card Absences/Retards */}
-      <CardItem
-        className="lg:col-span-1 md:col-span-2 col-span-1 row-span-2"
-        title="Présence"
-      >
-        {loadingAbcences || !PresenceDetails ? (
-          <div className="space-y-2">
-            {[...Array(3)].map((_, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <Skeleton className="h-4 w-1/3" />
-                <Skeleton className="h-4 w-12 rounded-md" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-4">
+      {/* Card Absences/Retards */ }
+      < CardItem
+  className = "lg:col-span-1 md:col-span-2 col-span-1 row-span-2"
+  title = "Présence"
+    >
+  {
+    loadingAbcences?(
+          <div className = "space-y-4" >
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-800">Absences justifiées</span>
-                <span className="font-medium text-gray-800">
-                  {PresenceDetails.absencesJustifiees}
-                </span>
+                <Skeleton className="h-4 w-32 rounded" />
+                <Skeleton className="h-4 w-8 rounded" />
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-800">Absences non justifiées</span>
-                <span className="font-medium text-destructive">
-                  {PresenceDetails.absencesNonJustifiees}
-                </span>
+                <Skeleton className="h-4 w-40 rounded" />
+                <Skeleton className="h-4 w-8 rounded" />
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-800">Retards</span>
-                <span className="font-medium text-gray-800">
-                  {PresenceDetails.retards}
-                </span>
+                <Skeleton className="h-4 w-20 rounded" />
+                <Skeleton className="h-4 w-8 rounded" />
               </div>
             </div>
             <Separator />
-            <div
-              className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}
-            >
+            <div className="p-2 rounded border-l-4 bg-zinc-100 border-zinc-300">
               <div className="flex items-center gap-2">
-                <Clock size={12} className={classes.icon} />
-                <span className={`text-xs ${classes.textMain}`}>
-                  Dernière absence:{" "}
-                  {PresenceDetails.derniereAbsence.length > 0
-                    ? PresenceDetails.derniereAbsence[0].date
-                    : "—"}
-                </span>
+                <Skeleton className="h-4 w-4 rounded-full" />
+                <Skeleton className="h-4 w-32 rounded" />
               </div>
-              <p className={`text-xs mt-1 ${classes.textSub}`}>
-                {PresenceDetails.derniereAbsence.length > 0
-                  ? `${PresenceDetails.derniereAbsence[0].cours} – ${PresenceDetails.derniereAbsence[0].justifiee
-                    ? "Justifiée"
-                    : "Non justifiée"
-                  }`
-                  : "Aucune absence"}
-              </p>
+              <Skeleton className="h-3 w-40 mt-1 rounded" />
             </div>
           </div>
-        )}
-      </CardItem>
+        ) : !PresenceDetails ? (
+    <div className="space-y-2">
+      <div className="flex justify-between items-center">
+        Pas de données sur les absences
+      </div>
+    </div>
+  ) : PresenceDetails.isError ? (
+    <div className="space-y-2">
+      <div className="flex justify-between items-center" style={{ color: 'red' }}>
+        Erreur API
+      </div>
+    </div>
+  ) : (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-gray-800">Absences justifiées</span>
+          <span className="font-medium text-gray-800">
+            {PresenceDetails.absencesJustifiees}
+          </span>
+        </div>
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-gray-800">Absences non justifiées</span>
+          <span className="font-medium text-destructive">
+            {PresenceDetails.absencesNonJustifiees}
+          </span>
+        </div>
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-gray-800">Retards</span>
+          <span className="font-medium text-gray-800">
+            {PresenceDetails.retards}
+          </span>
+        </div>
+      </div>
+      <Separator />
+      <div
+        className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}
+      >
+        <div className="flex items-center gap-2">
+          <Clock size={12} className={classes.icon} />
+          <span className={`text-xs ${classes.textMain}`}>
+            Dernière absence: {" "}
+            {PresenceDetails.derniereAbsence.length > 0
+              ? PresenceDetails.derniereAbsence[0].date
+              : "—"}
+          </span>
+        </div>
+        <p className={`text-xs mt-1 ${classes.textSub}`}>
+          {PresenceDetails.derniereAbsence.length > 0
+            ? `${PresenceDetails.derniereAbsence[0].cours} – ${PresenceDetails.derniereAbsence[0].justifiee
+              ? "Justifiée"
+              : "Non justifiée"
+            }`
+            : "Aucune absence"}
+        </p>
+      </div>
+    </div>
+  )
+}
+      </CardItem >
 
     </>
   );

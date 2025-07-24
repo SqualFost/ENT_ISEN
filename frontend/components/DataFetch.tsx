@@ -24,7 +24,12 @@ export async function loadNotation() {
     return notes;
   } catch (error) {
     console.error("Failed to load notation data:", error);
-    return [];
+    const errorNote = {
+      sujet: "Erreur de chargement",
+      score: 0,
+      isError: true, // Indique que c'est une erreur
+    };
+    return [errorNote]; // Retourne une note d'erreur
   }
 }
 
@@ -58,13 +63,20 @@ export async function loadAbscences() {
     return PresenceDetails;
   } catch (error) {
     console.error("Failed to load absence data:", error);
-    return null;
+    const errorPresence: Presence = {
+      isError: true, // Indique que c'est une erreur
+      absencesJustifiees: 0,
+      absencesNonJustifiees: 0,
+      retards: 0,
+      derniereAbsence: [],
+    };
+    return errorPresence; // Retourne une présence d'erreur
   }
 }
 export async function loadEDT() {
   try {
     const now = new Date();
-
+    // Aujourd’hui à 00h00:00.000
     const startOfDay = new Date(
       now.getFullYear(),
       now.getMonth(),
@@ -107,7 +119,16 @@ export async function loadEDT() {
     }
     return planning;
   } catch (error) {
+    // En cas d'erreur, retourner un tableau vide ou une valeur par défaut
+    const errorCours: Cours = {
+      isError: true, // Indique que c'est une erreur
+      heure: "Erreur de chargement",
+      cours: "Erreur de chargement",
+      salle: null,
+      isPause: false,
+      isExam: false,
+    };
     console.error("Failed to load EDT data:", error);
-    return [];
+    return [errorCours]; // Retourne un cours d'erreur
   }
 }

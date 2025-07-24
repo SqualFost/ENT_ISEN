@@ -9,8 +9,10 @@ export interface CardItemProps {
 export type Note = {
   sujet: string;
   score: number;
+  isError?: boolean; // Indique si la note est une erreur
 };
 export type Cours = {
+  isError? : boolean; // Indique si le cours est une erreur
   heure: string;
   cours: string;
   salle: string | null;
@@ -19,6 +21,7 @@ export type Cours = {
 }
 
 export type Presence = {
+  isError?: boolean; // Indique si la présence est une erreur
   absencesJustifiees: number;
   absencesNonJustifiees: number;
   retards: number;
