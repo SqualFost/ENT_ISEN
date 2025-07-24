@@ -1,38 +1,58 @@
 import ISEN_Api from "@/app/api/api";
 import { Cours, Presence } from "@/data";
 import Cookies from "js-cookie";
-
+import { Note } from "@/data";
 const api = new ISEN_Api();
 api.setToken(Cookies.get("token"));
 
 
-export async function loadNotation() {
+export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
   try {
-    const response = await api.getNotations();
-    let notes = []
-    let i = 0
-    for (const note of response) {
-      notes.push(note)
-      i++;
-      if (i >= 3) break; // Limiter à 3 notes
+    // Vérifie si les notes sont déjà en cache
+    const cached = sessionStorage.getItem("notation-cache");
+    if (cached) {
+      const notes = JSON.parse(cached) as Note[];
+      console.log("Notes from cache:", notes);
+      if (estNoteRecente) {
+        return notes.slice(0, 3); // Retourne les 3 dernières notes
+      }
+      return notes;
     }
+
+    // Sinon, appel API
+    const response = await api.getNotations();
+    let notes: Note[] = [];
+
+    for (let i = 0; i < response.length; i++) {
+      const note = response[i];
+      const parts = note.name.split(" - ");
+      notes.push({
+        nom: parts[2] || null,
+        sujet: parts[1],
+        score: note.note,
+      });
+    }
+
     console.log("Notes fetched:", notes);
-    notes = notes.map(note => ({
-      nom: note.name.split(" - ")[2] ? note.name.split(" - ")[2] : null, // Vérifie si le nom existe
-      sujet: note.name.split(" - ")[1],
-      score: note.note,
-    }));
+
+    // Stocker dans le sessionStorage
+    sessionStorage.setItem("notation-cache", JSON.stringify(notes));
+    if (estNoteRecente) {
+      return notes.slice(0, 3); // Retourne les 3 dernières notes
+    }
     return notes;
+
   } catch (error) {
     console.error("Failed to load notation data:", error);
-    const errorNote = {
+    const errorNote: Note = {
       sujet: "Erreur de chargement",
       score: 0,
-      isError: true, // Indique que c'est une erreur
+      isError: true,
     };
-    return [errorNote]; // Retourne une note d'erreur
+    return [errorNote];
   }
 }
+
 
 export async function loadAbscences() {
   try {
