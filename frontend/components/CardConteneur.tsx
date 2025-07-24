@@ -113,9 +113,9 @@ export default function CardConteneur() {
           notes.map((note, index) => (
             <div key={index}>
               <div className="flex items-center justify-between mt-2">
-                <span className="text-sm text-gray-800">{note.sujet}</span>
+                <span className="text-sm text-gray-800">{note.sujet} {note.nom} </span>
                 <Badge variant="secondary" className="bg-gray-100 text-black">
-                  {note.score}
+                  {note.score }
                 </Badge>
               </div>
               {index < notes.length - 1 && <Separator className="my-2" />}

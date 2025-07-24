@@ -18,6 +18,7 @@ export async function loadNotation() {
     }
     console.log("Notes fetched:", notes);
     notes = notes.map(note => ({
+      nom: note.name.split(" - ")[2] ? note.name.split(" - ")[2] : null, // Vérifie si le nom existe
       sujet: note.name.split(" - ")[1],
       score: note.note,
     }));
