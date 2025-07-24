@@ -1,7 +1,6 @@
 import ISEN_Api from "@/app/api/api";
-import { Cours, Presence } from "@/data";
+import { Cours, Presence, Note, Absences  } from "@/data";
 import Cookies from "js-cookie";
-import { Note } from "@/data";
 const api = new ISEN_Api();
 api.setToken(Cookies.get("token"));
 
@@ -56,31 +55,42 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
 
 export async function loadAbscences() {
   try {
+    // Vérifie si les absences sont déjà en cache
+    const cached = sessionStorage.getItem("absences-cache");
+    if (cached) {
+      const Presence = JSON.parse(cached) as Presence;
+      console.log("Absences from cache:", Presence);
+      return Presence;
+    }
     const response = await api.getAbscences();
+    // Stocker dans le sessionStorage
+    sessionStorage.setItem("absences-cache", JSON.stringify(response));
+
     console.log("Absences fetched:", response);
-    const derniereAbsence = response[0];
-    let justifie = [];
-    let nonJustifie = [];
+    let justifie = 0;
+    let nonJustifie = 0;
+    let absences: Absences[] = [];
     for (const absence of response) {
       if (absence.reason == "Absence non excusée") {
-        nonJustifie.push(absence);
+        nonJustifie += 1;
       }
       else {
-        justifie.push(absence);
+        justifie += 1;
       }
+      absences.push({
+        date: absence.date,
+        cours: absence.subject,
+        justifiee: !(absence.reason == "Absence non excusée"),
+        heure: absence.hours,
+      });
     }
     const PresenceDetails: Presence = {
-      absencesJustifiees: justifie.length,
-      absencesNonJustifiees: nonJustifie.length,
+      absencesJustifiees: justifie,
+      absencesNonJustifiees: nonJustifie,
       retards: 0, // Assuming no retards data available
-      derniereAbsence: [
-        {
-          date: derniereAbsence.date,
-          cours: derniereAbsence.subject,
-          justifiee: derniereAbsence.reason !== "Absence non excusée",
-        },
-      ],
+      absences: absences,
     };
+
     return PresenceDetails;
   } catch (error) {
     console.error("Failed to load absence data:", error);
@@ -89,13 +99,20 @@ export async function loadAbscences() {
       absencesJustifiees: 0,
       absencesNonJustifiees: 0,
       retards: 0,
-      derniereAbsence: [],
+      absences: [],
     };
     return errorPresence; // Retourne une présence d'erreur
   }
 }
 export async function loadEDT() {
   try {
+    // Vérifie si le planning est déjà en cache
+    const cached = sessionStorage.getItem("edt-cache");
+    if (cached) {
+      const planning = JSON.parse(cached) as Cours[];
+      console.log("EDT from cache:", planning);
+      return planning;
+    }
     const now = new Date();
     // Aujourd’hui à 00h00:00.000
     const startOfDay = new Date(
@@ -113,7 +130,8 @@ export async function loadEDT() {
       23, 59, 59, 999
     ).getTime();
     const response = await api.getAgenda(startOfDay, endOfDay);
-
+    // Stocker dans le sessionStorage
+    sessionStorage.setItem("edt-cache", JSON.stringify(response));
     console.log("EDT fetched:", response);
     const planning: Cours[] = [];
     for (const item of response) {
@@ -149,6 +167,7 @@ export async function loadEDT() {
       isPause: false,
       isExam: false,
     };
+
     console.error("Failed to load EDT data:", error);
     return [errorCours]; // Retourne un cours d'erreur
   }

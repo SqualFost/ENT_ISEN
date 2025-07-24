@@ -115,7 +115,7 @@ export default function CardConteneur() {
               <div className="flex items-center justify-between mt-2">
                 <span className="text-sm text-gray-800">{note.sujet} {note.nom} </span>
                 <Badge variant="secondary" className="bg-gray-100 text-black">
-                  {note.score }
+                  {note.score}
                 </Badge>
               </div>
               {index < notes.length - 1 && <Separator className="my-2" />}
@@ -255,158 +255,187 @@ export default function CardConteneur() {
         className="col-span-1 md:col-span-2 row-span-3"
         title={`Planning du ${formatDate(Date.now())}`}
       >
-      {/* Version condensée - jour actuel seulement */}
-      {loadingEDT ? (
-        <div className="space-y-1">
-          {[...Array(6)].map((_, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-3 p-2 rounded border-l-4 bg-blue-50 border-blue-400"
-            >
-              <Skeleton className="h-4 w-16 rounded" />
-              <div className="flex-1">
-                <Skeleton className="h-4 w-32 mb-1 rounded" />
-                <Skeleton className="h-3 w-20 rounded" />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : planning.length === 0 ? (
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            Pas de planning disponible aujourd'hui
-          </div>
-        </div>
-      ) : planning[0].isError ? (
-        <div className="space-y-2">
-          <div className="flex justify-between items-center" style={{ color: 'red' }}>
-            Erreur API
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-1">
-          {planning.map((item, index) => (
-            <div
-              key={index}
-              className={`flex items-center gap-3 p-2 rounded border-l-4 ${item.isPause
-                ? "bg-gray-50 border-gray-300"
-                : "bg-blue-50 border-blue-400"
-                }`}
-            >
+        {/* Version condensée - jour actuel seulement */}
+        {loadingEDT ? (
+          <div className="space-y-1">
+            {[...Array(6)].map((_, index) => (
               <div
-                className={`text-xs font-medium w-16 ${item.isPause ? "text-gray-500" : "text-blue-600"
+                key={index}
+                className="flex items-center gap-3 p-2 rounded border-l-4 bg-blue-50 border-blue-400"
+              >
+                <Skeleton className="h-4 w-16 rounded" />
+                <div className="flex-1">
+                  <Skeleton className="h-4 w-32 mb-1 rounded" />
+                  <Skeleton className="h-3 w-20 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : planning.length === 0 ? (
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              Pas de planning disponible aujourd'hui
+            </div>
+          </div>
+        ) : planning[0].isError ? (
+          <div className="space-y-2">
+            <div className="flex justify-between items-center" style={{ color: 'red' }}>
+              Erreur API
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {planning.map((item, index) => (
+              <div
+                key={index}
+                className={`flex items-center gap-3 p-2 rounded border-l-4 ${item.isPause
+                  ? "bg-gray-50 border-gray-300"
+                  : "bg-blue-50 border-blue-400"
                   }`}
               >
-                {item.heure}
+                <div
+                  className={`text-xs font-medium w-16 ${item.isPause ? "text-gray-500" : "text-blue-600"
+                    }`}
+                >
+                  {item.heure}
+                </div>
+                <div className="flex-1">
+                  {item.isPause ? (
+                    <p className="text-sm text-gray-600 italic">{item.cours}</p>
+                  ) : (
+                    <>
+                      <p className="text-sm font-medium text-blue-800">
+                        {item.cours}
+                      </p>
+                      <p className="text-xs text-blue-600">{item.salle}</p>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="flex-1">
-                {item.isPause ? (
-                  <p className="text-sm text-gray-600 italic">{item.cours}</p>
-                ) : (
-                  <>
-                    <p className="text-sm font-medium text-blue-800">
-                      {item.cours}
-                    </p>
-                    <p className="text-xs text-blue-600">{item.salle}</p>
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </CardItem >
-
-      {/* Card Absences/Retards */ }
-      < CardItem
-  className = "lg:col-span-1 md:col-span-2 col-span-1 row-span-2"
-  title = "Présence"
-    >
-  {
-    loadingAbcences?(
-          <div className = "space-y-4" >
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <Skeleton className="h-4 w-32 rounded" />
-                <Skeleton className="h-4 w-8 rounded" />
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <Skeleton className="h-4 w-40 rounded" />
-                <Skeleton className="h-4 w-8 rounded" />
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <Skeleton className="h-4 w-20 rounded" />
-                <Skeleton className="h-4 w-8 rounded" />
-              </div>
-            </div>
-            <Separator />
-            <div className="p-2 rounded border-l-4 bg-zinc-100 border-zinc-300">
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-4 w-4 rounded-full" />
-                <Skeleton className="h-4 w-32 rounded" />
-              </div>
-              <Skeleton className="h-3 w-40 mt-1 rounded" />
-            </div>
+            ))}
           </div>
-        ) : !PresenceDetails ? (
-    <div className="space-y-2">
-      <div className="flex justify-between items-center">
-        Pas de données sur les absences
-      </div>
-    </div>
-  ) : PresenceDetails.isError ? (
-    <div className="space-y-2">
-      <div className="flex justify-between items-center" style={{ color: 'red' }}>
-        Erreur API
-      </div>
-    </div>
-  ) : (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-800">Absences justifiées</span>
-          <span className="font-medium text-gray-800">
-            {PresenceDetails.absencesJustifiees}
-          </span>
-        </div>
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-800">Absences non justifiées</span>
-          <span className="font-medium text-destructive">
-            {PresenceDetails.absencesNonJustifiees}
-          </span>
-        </div>
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-800">Retards</span>
-          <span className="font-medium text-gray-800">
-            {PresenceDetails.retards}
-          </span>
-        </div>
-      </div>
-      <Separator />
-      <div
-        className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}
+        )}
+      </CardItem >
+
+      {/* Card Absences/Retards */}
+      <CardItem
+        className="lg:col-span-1 md:col-span-2 col-span-1 row-span-2"
+        title="Présence"
+        contenuEtendu={
+          PresenceDetails && PresenceDetails.absences.length > 0 ? (
+            <div className="space-y-2">
+              {PresenceDetails.absences.map((absence, index) => (
+                <div
+                  key={index}
+                  className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Clock size={12} className={classes.icon} />
+                    <span className={`text-xs ${classes.textMain}`}>
+                      Absence: {absence.date + " " + (absence.heure || "")}
+                    </span>
+                  </div>
+                  <p className={`text-xs mt-1 ${classes.textSub}`}>
+                    {absence.cours} – {absence.justifiee ? "Justifiée" : "Non justifiée"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}>
+              <div className="flex items-center gap-2">
+                <Clock size={12} className={classes.icon} />
+                <span className={`text-xs ${classes.textMain}`}>
+                  Aucune absence
+                </span>
+              </div>
+            </div>
+          )
+        }
       >
-        <div className="flex items-center gap-2">
-          <Clock size={12} className={classes.icon} />
-          <span className={`text-xs ${classes.textMain}`}>
-            Dernière absence: {" "}
-            {PresenceDetails.derniereAbsence.length > 0
-              ? PresenceDetails.derniereAbsence[0].date
-              : "—"}
-          </span>
-        </div>
-        <p className={`text-xs mt-1 ${classes.textSub}`}>
-          {PresenceDetails.derniereAbsence.length > 0
-            ? `${PresenceDetails.derniereAbsence[0].cours} – ${PresenceDetails.derniereAbsence[0].justifiee
-              ? "Justifiée"
-              : "Non justifiée"
-            }`
-            : "Aucune absence"}
-        </p>
-      </div>
-    </div>
-  )
-}
+        {
+          loadingAbcences ? (
+            <div className="space-y-4" >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <Skeleton className="h-4 w-32 rounded" />
+                  <Skeleton className="h-4 w-8 rounded" />
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <Skeleton className="h-4 w-40 rounded" />
+                  <Skeleton className="h-4 w-8 rounded" />
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <Skeleton className="h-4 w-20 rounded" />
+                  <Skeleton className="h-4 w-8 rounded" />
+                </div>
+              </div>
+              <Separator />
+              <div className="p-2 rounded border-l-4 bg-zinc-100 border-zinc-300">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-4 rounded-full" />
+                  <Skeleton className="h-4 w-32 rounded" />
+                </div>
+                <Skeleton className="h-3 w-40 mt-1 rounded" />
+              </div>
+            </div>
+          ) : !PresenceDetails ? (
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                Pas de données sur les absences
+              </div>
+            </div>
+          ) : PresenceDetails.isError ? (
+            <div className="space-y-2">
+              <div className="flex justify-between items-center" style={{ color: 'red' }}>
+                Erreur API
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-800">Absences justifiées</span>
+                  <span className="font-medium text-gray-800">
+                    {PresenceDetails.absencesJustifiees}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-800">Absences non justifiées</span>
+                  <span className="font-medium text-destructive">
+                    {PresenceDetails.absencesNonJustifiees}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-800">Retards</span>
+                  <span className="font-medium text-gray-800">
+                    {PresenceDetails.retards}
+                  </span>
+                </div>
+              </div>
+              <Separator />
+              <div
+                className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}
+              >
+                <div className="flex items-center gap-2">
+                  <Clock size={12} className={classes.icon} />
+                  <span className={`text-xs ${classes.textMain}`}>
+                    Dernière absences: {PresenceDetails.absences[0].date + " " + (PresenceDetails.absences[0].heure || "")}
+                  </span>
+                </div>
+                <p className={`text-xs mt-1 ${classes.textSub}`}>
+                  {PresenceDetails.absences.length > 0
+                    ? `${PresenceDetails.absences[0].cours} – ${PresenceDetails.absences[0].justifiee
+                      ? "Justifiée"
+                      : "Non justifiée"
+                    }`
+                    : "Aucune absence"}
+                </p>
+              </div>
+            </div>
+          )
+        }
+
       </CardItem >
 
     </>

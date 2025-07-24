@@ -20,13 +20,18 @@ export type Cours = {
   isPause?: boolean;
   isExam: boolean;
 }
-
+export type Absences = {
+  date: string;
+  cours: string;
+  justifiee: boolean;
+  heure?: string; // Optionnel si l'heure n'est pas disponible
+}
 export type Presence = {
   isError?: boolean; // Indique si la présence est une erreur
   absencesJustifiees: number;
   absencesNonJustifiees: number;
   retards: number;
-  derniereAbsence: { date: string; cours: string; justifiee: boolean }[];
+  absences: Absences[];
 };
 // Data provisioires
 
