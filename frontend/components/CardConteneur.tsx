@@ -273,8 +273,8 @@ export default function CardConteneur() {
           </div>
         ) : planning.length === 0 ? (
           <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              Pas de planning disponible aujourd'hui
+            <div className="flex items-center justify-center text-sm text-gray-500 py-4">
+              Aucun cours prévu aujourd'hui
             </div>
           </div>
         ) : planning[0].isError ? (
@@ -322,7 +322,7 @@ export default function CardConteneur() {
         className="lg:col-span-1 md:col-span-2 col-span-1 row-span-2"
         title="Présence"
         contenuEtendu={
-          PresenceDetails && PresenceDetails.absences.length > 0 ? (
+          PresenceDetails && Array.isArray(PresenceDetails.absences) ? (
             <div className="space-y-2">
               {PresenceDetails.absences.map((absence, index) => (
                 <div

@@ -1,5 +1,5 @@
 import ISEN_Api from "@/app/api/api";
-import { Cours, Presence, Note, Absences  } from "@/data";
+import { Cours, Presence, Note, Absences } from "@/data";
 import Cookies from "js-cookie";
 const api = new ISEN_Api();
 api.setToken(Cookies.get("token"));
@@ -21,7 +21,6 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
     // Sinon, appel API
     const response = await api.getNotations();
     let notes: Note[] = [];
-
     for (let i = 0; i < response.length; i++) {
       const note = response[i];
       const parts = note.name.split(" - ");
@@ -64,7 +63,6 @@ export async function loadAbscences() {
     }
     const response = await api.getAbscences();
     // Stocker dans le sessionStorage
-    sessionStorage.setItem("absences-cache", JSON.stringify(response));
 
     console.log("Absences fetched:", response);
     let justifie = 0;
@@ -90,7 +88,7 @@ export async function loadAbscences() {
       retards: 0, // Assuming no retards data available
       absences: absences,
     };
-
+    sessionStorage.setItem("absences-cache", JSON.stringify(PresenceDetails));
     return PresenceDetails;
   } catch (error) {
     console.error("Failed to load absence data:", error);
@@ -110,8 +108,10 @@ export async function loadEDT() {
     const cached = sessionStorage.getItem("edt-cache");
     if (cached) {
       const planning = JSON.parse(cached) as Cours[];
+
       console.log("EDT from cache:", planning);
       return planning;
+
     }
     const now = new Date();
     // Aujourd’hui à 00h00:00.000

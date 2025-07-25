@@ -35,6 +35,10 @@ export default function Navbar() {
     Cookies.remove("token"); // Supprimer le cookie
     router.push("/login"); // Redirection vers la page de connexion
   };
+  const handleRefresh = () => {
+    sessionStorage.clear(); // Nettoyer le cache
+    window.location.reload(); // Recharger la page
+  }
   return (
     <Card className="w-64 flex flex-col h-full max-h-screen">
       <CardHeader className="border-b">
@@ -63,8 +67,8 @@ export default function Navbar() {
       </div>
 
       {/* Footer toujours collé en bas */}
-      <CardFooter className="p-4 border-t">
-        <div className="flex items-center space-x-3 px-4 pt-3">
+      <CardFooter className="p-4 border-t flex flex-col gap-2">
+        <div className="flex items-center space-x-3 px-4 pt-3 w-full">
           <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
             <User size={16} className="text-white" />
           </div>
@@ -81,7 +85,17 @@ export default function Navbar() {
             <LogOut size={16} className="mr-1" />
           </Button>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full"
+          onClick={handleRefresh}
+        >
+          Actualiser la page
+        </Button>
       </CardFooter>
+
+
     </Card>
   );
 }
