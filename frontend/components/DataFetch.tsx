@@ -36,8 +36,8 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
     ).map(({ name, note }) => {
       const parts = name.split(" - ");
       return {
-        sujet: parts[1],
-        nom: parts[2],
+        sujet: parts[1] ?? "Sujet inconnu",
+        nom: parts[2] ?? "Nom inconnu",
         score: parseFloat(note),
       };
     });
@@ -50,6 +50,7 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
       {
         sujet: "Erreur de chargement",
         score: 0,
+        nom: "",
         isError: true,
       },
     ];
@@ -108,7 +109,7 @@ export async function loadEDT(
     const cached = recupCache<Cours[]>(cacheKey);
     if (cached) return cached;
 
-    const response = await api.getAgenda(1731372121000, 1731436921000);
+    const response = await api.getAgenda(start, end);
 
     const planning: Cours[] = (
       response as {
@@ -347,8 +348,6 @@ export async function loadInfo(): Promise<InfosPerso | null> {
       aValideCharteVieEtudiante: response.haveAcknowledgeStudentLifeCharter,
       autoriseUtilisationImage: response.canIsenUsePersonalImage,
     };
-
-    console.log("Infos perso chargées :", infos);
     return infos;
   } catch (error) {
     console.error(

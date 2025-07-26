@@ -8,7 +8,7 @@ export interface CardItemProps {
 }
 export type Note = {
   sujet: string;
-  nom?: string;
+  nom: string;
   score: number;
   isError?: boolean; // Indique si la note est une erreur
 };
