@@ -23,9 +23,9 @@ import {
   classes,
 } from "@/data";
 import ISEN_Api from "@/app/api/api";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
-import { loadAbscences, loadEDT, loadNotation } from "./DataFetch";
+import { loadAbscences, loadEDT, loadNotation, setEdtForAgenda } from "./DataFetch";
 
 
 const notifications = [
@@ -71,12 +71,34 @@ export default function CardConteneur() {
     };
     fetchAbsences();
   }, []);
-
+  useEffect(() => {
+    const fetchEDT = async () => {
+      const result = await setEdtForAgenda();
+      console.log("EDT set for agenda:", result);
+    };
+    fetchEDT();
+  }, []);
   const [loadingEDT, setLoadingEDT] = useState(true);
   const [planning, setPlanning] = useState<Cours[]>([]);
   useEffect(() => {
     const fetchEDT = async () => {
-      const result = await loadEDT();
+      const now = new Date();
+      // Aujourd’hui à 00h00:00.000
+      const startOfDay = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        0, 0, 0, 0
+      ).getTime();
+
+      // Aujourd’hui à 23h59:59.999
+      const endOfDay = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        23, 59, 59, 999
+      ).getTime();
+      const result = await loadEDT(startOfDay, endOfDay);
 
       setPlanning(result || []);
       setLoadingEDT(false);
