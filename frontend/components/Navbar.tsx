@@ -19,6 +19,10 @@ import {
 import Cookies from "js-cookie";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { InfosPerso } from "@/data";
+import { loadInfo } from "./DataFetch";
+import { Skeleton } from "./ui/skeleton";
 
 const liens = [
   { icon: CircleUser, label: "Mon compte", href: "#" },
@@ -30,6 +34,7 @@ const liens = [
 ];
 
 export default function Navbar() {
+  const [infos, setInfos] = useState<InfosPerso | null>(null);
   const router = useRouter();
   const handleLogout = () => {
     Cookies.remove("token"); // Supprimer le cookie
@@ -38,7 +43,15 @@ export default function Navbar() {
   const handleRefresh = () => {
     sessionStorage.clear(); // Nettoyer le cache
     window.location.reload(); // Recharger la page
-  }
+  };
+
+  useEffect(() => {
+    const fetchInfos = async () => {
+      const data = await loadInfo();
+      setInfos(data);
+    };
+    fetchInfos();
+  }, []);
   return (
     <Card className="w-64 flex flex-col h-full max-h-screen">
       <CardHeader className="border-b">
@@ -73,8 +86,17 @@ export default function Navbar() {
             <User size={16} className="text-white" />
           </div>
           <div>
-            <p className="text-sm font-medium">Etudiant Genial</p>
-            <p className="text-xs text-slate-700">etudiant@genial.com</p>
+            {infos === null ? (
+              <div className="flex flex-col gap-1">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-48" />
+              </div>
+            ) : (
+              <>
+                <p className="text-sm font-medium">{`${infos.prenom} ${infos.nom}`}</p>
+                <p className="text-xs text-slate-700">{infos.emailPersonnel}</p>
+              </>
+            )}
           </div>
           <Button
             variant="ghost"
@@ -94,8 +116,6 @@ export default function Navbar() {
           Actualiser la page
         </Button>
       </CardFooter>
-
-
     </Card>
   );
 }

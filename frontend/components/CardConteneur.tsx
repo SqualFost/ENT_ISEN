@@ -4,8 +4,9 @@ import CardItem from "@/components/CardItem";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { formatDate } from "@/lib/utils";
-
+import { formatDate, cn } from "@/lib/utils";
+import { Skeleton } from "./ui/skeleton";
+import { useEffect, useState } from "react";
 import {
   CircleCheckBig,
   Ban,
@@ -13,10 +14,8 @@ import {
   AlertCircle,
   Clock,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 import { Cours, Note, Presence, evenements, ERDetails, classes } from "@/data";
-import { useEffect, useState } from "react";
-import { Skeleton } from "./ui/skeleton";
 import {
   loadAbscences,
   loadEDT,
