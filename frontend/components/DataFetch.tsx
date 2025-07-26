@@ -27,12 +27,18 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
     if (cached) return estNoteRecente ? cached.slice(0, 3) : cached;
 
     const response = await api.getNotations();
-    const notes: Note[] = response.map((note: any) => {
-      const parts = note.name.split(" - ");
+
+    const notes: Note[] = (
+      response as {
+        name: string;
+        note: string;
+      }[]
+    ).map(({ name, note }) => {
+      const parts = name.split(" - ");
       return {
-        nom: parts[2] || null,
         sujet: parts[1],
-        score: note.note,
+        nom: parts[2],
+        score: parseFloat(note),
       };
     });
 
@@ -102,26 +108,38 @@ export async function loadEDT(
     const cached = recupCache<Cours[]>(cacheKey);
     if (cached) return cached;
 
-    const response = await api.getAgenda(start, end);
-    const planning: Cours[] = response.map((item: any) => {
-      const title = item.title.split(" - ");
-      const heure = `${title[0]}-${title[1]}`;
-      const cours = title.length === 11 ? `${title[2]} ${title[3]}` : title[2];
-      const salle = title.length === 11 ? title[6] : title[5];
+    const response = await api.getAgenda(1731372121000, 1731436921000);
+
+    const planning: Cours[] = (
+      response as {
+        title: string;
+        className?: string;
+        start: string;
+      }[]
+    ).map(({ title, className, start }) => {
+      const parts = title.split(" - ");
+      const heure = `${parts[0]}-${parts[1]}`;
+      const cours =
+        parts.length === 11
+          ? `${parts[2]} ${parts[3]}`
+          : parts[2] || "Cours non précisé";
+      const salle =
+        parts.length === 11 ? parts[6] : parts[5] || "Salle non précisée";
+
       return {
         heure,
         cours,
         salle,
         isPause: false,
-        isExam: item.className === "est-epreuve",
-        date: item.start.split("T")[0],
+        isExam: className === "est-epreuve",
+        date: start.split("T")[0],
       };
     });
 
     setCache(cacheKey, planning);
     return planning;
   } catch (error) {
-    console.error("Failed to load EDT data:", error);
+    console.error("Impossible de charger les données de l'EDT : ", error);
     return [
       {
         isError: true,

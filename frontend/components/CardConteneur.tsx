@@ -67,12 +67,9 @@ export default function CardConteneur() {
     fetchAbsences();
   }, []);
   useEffect(() => {
-    const fetchEDT = async () => {
-      const result = await setEdtForAgenda();
-      console.log("EDT set for agenda:", result);
-    };
-    fetchEDT();
+    setEdtForAgenda().then((res) => console.log("EDT mis pour l'agenda:", res));
   }, []);
+
   const [loadingEDT, setLoadingEDT] = useState(true);
   const [planning, setPlanning] = useState<Cours[]>([]);
   useEffect(() => {
