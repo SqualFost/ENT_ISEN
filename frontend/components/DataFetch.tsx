@@ -1,9 +1,9 @@
 import ISEN_Api from "@/app/api/api";
 import { Cours, Presence, Note, Absences, JourneeCours } from "@/data";
 import Cookies from "js-cookie";
+
 const api = new ISEN_Api();
 api.setToken(Cookies.get("token"));
-
 
 export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
   try {
@@ -20,7 +20,7 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
 
     // Sinon, appel API
     const response = await api.getNotations();
-    let notes: Note[] = [];
+    const notes: Note[] = [];
     for (let i = 0; i < response.length; i++) {
       const note = response[i];
       const parts = note.name.split(" - ");
@@ -39,7 +39,6 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
       return notes.slice(0, 3); // Retourne les 3 dernières notes
     }
     return notes;
-
   } catch (error) {
     console.error("Failed to load notation data:", error);
     const errorNote: Note = {
@@ -50,7 +49,6 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
     return [errorNote];
   }
 }
-
 
 export async function loadAbscences() {
   try {
@@ -67,12 +65,11 @@ export async function loadAbscences() {
     console.log("Absences fetched:", response);
     let justifie = 0;
     let nonJustifie = 0;
-    let absences: Absences[] = [];
+    const absences: Absences[] = [];
     for (const absence of response) {
       if (absence.reason == "Absence non excusée") {
         nonJustifie += 1;
-      }
-      else {
+      } else {
         justifie += 1;
       }
       absences.push({
@@ -102,7 +99,11 @@ export async function loadAbscences() {
     return errorPresence; // Retourne une présence d'erreur
   }
 }
-export async function loadEDT(start: number, end: number, EDTcomplet = false): Promise<Cours[]> {
+export async function loadEDT(
+  start: number,
+  end: number,
+  EDTcomplet = false
+): Promise<Cours[]> {
   try {
     // Vérifie si le planning est déjà en cache
     if (EDTcomplet) {
@@ -112,8 +113,7 @@ export async function loadEDT(start: number, end: number, EDTcomplet = false): P
         console.log("EDT complet from cache:", planning);
         return planning;
       }
-    }
-    else {
+    } else {
       const cached = sessionStorage.getItem("edt-cache");
       if (cached) {
         const planning = JSON.parse(cached) as Cours[];
@@ -138,8 +138,7 @@ export async function loadEDT(start: number, end: number, EDTcomplet = false): P
           isExam: item.className === "est-epreuve" ? true : false,
           date: item.start.split("T")[0],
         });
-      }
-      else {
+      } else {
         planning.push({
           heure: title[0] + "-" + title[1],
           cours: title[2],
@@ -149,12 +148,10 @@ export async function loadEDT(start: number, end: number, EDTcomplet = false): P
           date: item.start.split("T")[0],
         });
       }
-
     }
     if (EDTcomplet) {
       sessionStorage.setItem("edt-cache-complet", JSON.stringify(planning));
-    }
-    else {
+    } else {
       sessionStorage.setItem("edt-cache", JSON.stringify(planning));
     }
     return planning;
@@ -167,7 +164,7 @@ export async function loadEDT(start: number, end: number, EDTcomplet = false): P
       salle: "",
       isPause: false,
       isExam: false,
-      date: ""
+      date: "",
     };
 
     console.error("Failed to load EDT data:", error);
@@ -183,8 +180,8 @@ export async function setEdtForAgenda() {
   end.setDate(end.getDate() + (6 - end.getDay())); // Fin de la semaine
   end.setHours(23, 59, 59, 999);
   //Timestamp milliseconds
-  const startTimestamp = Math.floor(start.getTime());
-  const endTimestamp = Math.floor(end.getTime());
+  //const startTimestamp = Math.floor(start.getTime());
+  //const endTimestamp = Math.floor(end.getTime());
   // 1730679782000 1731108182000 semaine pour test
   // const edt = await loadEDT(startTimestamp, endTimestamp, true);
   const edt: Cours[] = [
@@ -219,14 +216,22 @@ export async function setEdtForAgenda() {
       isPause: false,
       isExam: false,
       date: "2001-12-06", // Jeudi
-    }
+    },
   ];
-  const joursSemaine = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+  const joursSemaine = [
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi",
+    "Dimanche",
+  ];
 
   // Grouper les cours par date
   const coursParDate = new Map<string, Cours[]>();
 
-  edt.forEach(cours => {
+  edt.forEach((cours) => {
     if (!coursParDate.has(cours.date)) {
       coursParDate.set(cours.date, []);
     }
@@ -239,8 +244,8 @@ export async function setEdtForAgenda() {
   coursParDate.forEach((coursJour, date) => {
     // Trier les cours par heure de début
     coursJour.sort((a, b) => {
-      const heureA = parseInt(a.heure.split('h')[0]);
-      const heureB = parseInt(b.heure.split('h')[0]);
+      const heureA = parseInt(a.heure.split("h")[0]);
+      const heureB = parseInt(b.heure.split("h")[0]);
       return heureA - heureB;
     });
 
@@ -252,7 +257,7 @@ export async function setEdtForAgenda() {
     const journee: JourneeCours = {
       cours: [],
       day: nomJour,
-      date: date
+      date: date,
     };
 
     // Ajouter les cours avec pauses automatiques
@@ -265,8 +270,8 @@ export async function setEdtForAgenda() {
         const coursSuivant = coursJour[i + 1];
 
         // Extraire les heures de fin et de début
-        const finActuel = coursActuel.heure.split('-')[1];
-        const debutSuivant = coursSuivant.heure.split('-')[0];
+        const finActuel = coursActuel.heure.split("-")[1];
+        const debutSuivant = coursSuivant.heure.split("-")[0];
 
         // Si les heures ne se suivent pas directement, ajouter une pause
         if (finActuel !== debutSuivant) {
@@ -276,7 +281,7 @@ export async function setEdtForAgenda() {
             salle: "",
             isPause: true,
             isExam: false,
-            date: coursActuel.date
+            date: coursActuel.date,
           };
           journee.cours.push(pause);
         }
@@ -287,7 +292,9 @@ export async function setEdtForAgenda() {
   });
 
   // Trier l'agenda par date
-  agenda.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  agenda.sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
 
   return agenda;
 }
