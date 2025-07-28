@@ -18,6 +18,10 @@ class ISEN_Api {
       }
       return await response.json();
     } catch (error) {
+      if (error.status == 500) {
+        window.location.href = '/login';
+        return;
+      }
       console.error("Error fetching data:", error);
       throw error;
     }

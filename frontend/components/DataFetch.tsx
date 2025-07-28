@@ -43,7 +43,6 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
 
   } catch (error) {
     console.error("Failed to load notation data:", error);
-    
     const errorNote: Note = {
       sujet: "Erreur de chargement",
       score: 0,
