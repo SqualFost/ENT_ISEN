@@ -8,7 +8,7 @@ export interface CardItemProps {
 }
 export type Note = {
   sujet: string;
-  nom?: string;
+  nom: string;
   score: number;
   isError?: boolean; // Indique si la note est une erreur
 };
@@ -17,16 +17,17 @@ export type Cours = {
   heure: string;
   cours: string;
   salle?: string ;
-  isPause?: boolean;
+  isPause: boolean;
+  isEvent? : boolean;
   isExam: boolean;
   date: string; // Optionnel si la date n'est pas disponible
-}
+};
 export type Absences = {
   date: string;
   cours: string;
   justifiee: boolean;
   heure?: string; // Optionnel si l'heure n'est pas disponible
-}
+};
 export type Presence = {
   isError?: boolean; // Indique si la présence est une erreur
   absencesJustifiees: number;
@@ -39,7 +40,60 @@ export type JourneeCours = {
   cours: Cours[];
   day: string; // Nom du jour de la semaine
   date: string; // Date au format YYYY-MM-DD
-}
+};
+
+export type InfosPerso = {
+  civilite: string;
+  nom: string;
+  prenom: string;
+  deuxiemePrenoms?: string;
+  sexe: string;
+  dateNaissance: string;
+  lieuNaissance: string;
+  nationalite: string;
+  adressePersonnelle: Adresse;
+  adresseParents: Adresse;
+  adresseEnvoiBulletins: Adresse;
+  adresseFacturation: Adresse;
+  telephonePersonnel: string;
+  telephoneParents: string;
+  emailEnvoiBulletins: string;
+  emailParents: string;
+  emailPersonnel: string;
+  dernierDiplome: string;
+  bac: Bac;
+  pere: Parent;
+  mere: Parent;
+  aValideReglementInterieur: boolean;
+  aValideCharteVieEtudiante: boolean;
+  autoriseUtilisationImage: boolean;
+};
+
+export type Adresse = {
+  civilite: string;
+  nom: string;
+  ligneAdresse1: string;
+  ligneAdresse2: string;
+  ligneAdresse3: string;
+  codePostalVille: string;
+  pays: string;
+};
+
+export type Bac = {
+  academie: string;
+  annee: string;
+  type: string;
+  note: string;
+  mention: string;
+  etablissement: string;
+  codeEtablissement: string;
+};
+
+export type Parent = {
+  nom: string;
+  prenom: string;
+  profession: string;
+};
 
 export const notes = [
   { sujet: "Mathématiques", score: "20/20" },
@@ -113,19 +167,19 @@ export const PresenceDetails = {
 
 export const classes = PresenceDetails.derniereAbsence[0].justifiee
   ? {
-    bg: "bg-yellow-50",
-    border: "border-yellow-400",
-    icon: "text-yellow-500",
-    textMain: "text-yellow-700",
-    textSub: "text-yellow-600",
-  }
+      bg: "bg-yellow-50",
+      border: "border-yellow-400",
+      icon: "text-yellow-500",
+      textMain: "text-yellow-700",
+      textSub: "text-yellow-600",
+    }
   : {
-    bg: "bg-red-50",
-    border: "border-red-400",
-    icon: "text-red-500",
-    textMain: "text-red-700",
-    textSub: "text-red-600",
-  };
+      bg: "bg-red-50",
+      border: "border-red-400",
+      icon: "text-red-500",
+      textMain: "text-red-700",
+      textSub: "text-red-600",
+    };
 
 export const notifColors = {
   red: {

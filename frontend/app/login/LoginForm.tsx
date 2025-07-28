@@ -130,6 +130,10 @@ export default function LoginForm() {
                 "Se connecter"
               )}
             </Button>
+            {/* Affichage des erreurs */}
+            {error && (
+              <p className="text-red-500 text-sm text-center mt-2">{error}</p>
+            )}
           </form>
         </CardContent>
       </Card>

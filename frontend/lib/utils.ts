@@ -33,3 +33,12 @@ export function formatDate(timestamp: number) {
 
   return `${jourSemaine} ${jour} ${moisNom} semaine ${semaine}`;
 }
+export function DateStrToTimeStamp(dateStr: string): number {
+  const [day, month, year] = dateStr.split('-').map(Number);
+  
+  // Crée une date en tenant compte du fuseau horaire local
+  const date = new Date(year, month - 1, day);
+  
+  // Retourne le timestamp
+  return date.getTime();
+}

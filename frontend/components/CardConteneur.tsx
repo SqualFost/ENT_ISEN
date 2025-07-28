@@ -4,8 +4,9 @@ import CardItem from "@/components/CardItem";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { formatDate } from "@/lib/utils";
-
+import { formatDate, cn, DateStrToTimeStamp } from "@/lib/utils";
+import { Skeleton } from "./ui/skeleton";
+import { useEffect, useState } from "react";
 import {
   CircleCheckBig,
   Ban,
@@ -13,20 +14,15 @@ import {
   AlertCircle,
   Clock,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import {
-  Cours,
-  Note,
-  Presence,
-  evenements,
-  ERDetails,
-  classes,
-} from "@/data";
-import ISEN_Api from "@/app/api/api";
-import { use, useEffect, useState } from "react";
-import { Skeleton } from "./ui/skeleton";
-import { loadAbscences, loadEDT, loadNotation, setEdtForAgenda } from "./DataFetch";
 
+import { Cours, Note, Presence, evenements, ERDetails, classes } from "@/data";
+import {
+  loadAbscences,
+  loadEDT,
+  loadNotation,
+  setEdtForAgenda,
+  setEvent,
+} from "./DataFetch";
 
 const notifications = [
   {
@@ -71,13 +67,7 @@ export default function CardConteneur() {
     };
     fetchAbsences();
   }, []);
-  useEffect(() => {
-    const fetchEDT = async () => {
-      const result = await setEdtForAgenda();
-      console.log("EDT set for agenda:", result);
-    };
-    fetchEDT();
-  }, []);
+
   const [loadingEDT, setLoadingEDT] = useState(true);
   const [planning, setPlanning] = useState<Cours[]>([]);
   useEffect(() => {
@@ -88,7 +78,10 @@ export default function CardConteneur() {
         now.getFullYear(),
         now.getMonth(),
         now.getDate(),
-        0, 0, 0, 0
+        0,
+        0,
+        0,
+        0
       ).getTime();
 
       // Aujourd’hui à 23h59:59.999
@@ -96,15 +89,28 @@ export default function CardConteneur() {
         now.getFullYear(),
         now.getMonth(),
         now.getDate(),
-        23, 59, 59, 999
+        23,
+        59,
+        59,
+        999
       ).getTime();
       const result = await loadEDT(startOfDay, endOfDay);
 
       setPlanning(result || []);
       setLoadingEDT(false);
-
     };
     fetchEDT();
+  }, []);
+
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [Events, setEventList] = useState<Cours[] | null>(null);
+  useEffect(() => {
+    const setEvents = async () => {
+      const result = await setEvent();
+      setEventList(result);
+      setLoadingEvents(false);
+    };
+    setEvents();
   }, []);
   return (
     <>
@@ -127,7 +133,10 @@ export default function CardConteneur() {
           </div>
         ) : notes[0].isError ? (
           <div className="space-y-2">
-            <div className="flex justify-between items-center" style={{ color: 'red' }}>
+            <div
+              className="flex justify-between items-center"
+              style={{ color: "red" }}
+            >
               Erreur API
             </div>
           </div>
@@ -135,7 +144,9 @@ export default function CardConteneur() {
           notes.map((note, index) => (
             <div key={index}>
               <div className="flex items-center justify-between mt-2">
-                <span className="text-sm text-gray-800">{note.sujet} {note.nom} </span>
+                <span className="text-sm text-gray-800">
+                  {note.sujet} {note.nom}{" "}
+                </span>
                 <Badge variant="secondary" className="bg-gray-100 text-black">
                   {note.score}
                 </Badge>
@@ -180,21 +191,46 @@ export default function CardConteneur() {
 
       {/* Card evenement */}
       <CardItem className="col-span-1" title="Événements">
-        <div className="space-y-3">
-          {evenements.map((event, index) => (
-            <div className="flex items-center gap-3" key={index}>
-              <div
-                className={cn("w-2 h-2 rounded-full", `bg-${event.color}-400`)}
-              />
-              <div>
-                <p className="text-sm text-gray-800 font-medium">
-                  {event.titre}
-                </p>
-                <p className="text-xs text-gray-500">{event.date}</p>
+        {loadingEvents ? (
+          <div className="space-y-3">
+            {[...Array(3)].map((_, index) => (
+              <div className="flex items-center gap-3" key={index}>
+                <Skeleton className="w-2 h-2 rounded-full" />
+                <div className="space-y-1">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
               </div>
+            ))}
+          </div>
+        ) : !Events || Events.length === 0 ? (
+          <div className="flex items-center justify-center text-sm text-gray-500 py-4">
+            Aucun événement à venir
+          </div>
+        ) : Events[0].isError ? (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-red-500">
+              <AlertCircle size={16} />
+              <span className="text-sm">Erreur lors du chargement des événements</span>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {Events.filter(event => event.isEvent).map((event, index) => (
+              <div className="flex items-center gap-3" key={index}>
+                <div className="w-2 h-2 rounded-full bg-blue-400" /> {/* Couleur par défaut */}
+                <div>
+                  <p className="text-sm text-gray-800 font-medium">
+                    {event.cours} {/* Utilisation de cours si titre n'existe pas */}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {formatDate(DateStrToTimeStamp(event.date))} {event.heure && `à ${event.heure}`}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </CardItem>
 
       {/* Card ER */}
@@ -296,12 +332,15 @@ export default function CardConteneur() {
         ) : planning.length === 0 ? (
           <div className="space-y-2">
             <div className="flex items-center justify-center text-sm text-gray-500 py-4">
-              Aucun cours prévu aujourd'hui
+              Aucun cours prévu aujourd&apos;hui
             </div>
           </div>
         ) : planning[0].isError ? (
           <div className="space-y-2">
-            <div className="flex justify-between items-center" style={{ color: 'red' }}>
+            <div
+              className="flex justify-between items-center"
+              style={{ color: "red" }}
+            >
               Erreur API
             </div>
           </div>
@@ -310,14 +349,16 @@ export default function CardConteneur() {
             {planning.map((item, index) => (
               <div
                 key={index}
-                className={`flex items-center gap-3 p-2 rounded border-l-4 ${item.isPause
-                  ? "bg-gray-50 border-gray-300"
-                  : "bg-blue-50 border-blue-400"
-                  }`}
+                className={`flex items-center gap-3 p-2 rounded border-l-4 ${
+                  item.isPause
+                    ? "bg-gray-50 border-gray-300"
+                    : "bg-blue-50 border-blue-400"
+                }`}
               >
                 <div
-                  className={`text-xs font-medium w-16 ${item.isPause ? "text-gray-500" : "text-blue-600"
-                    }`}
+                  className={`text-xs font-medium w-16 ${
+                    item.isPause ? "text-gray-500" : "text-blue-600"
+                  }`}
                 >
                   {item.heure}
                 </div>
@@ -337,7 +378,7 @@ export default function CardConteneur() {
             ))}
           </div>
         )}
-      </CardItem >
+      </CardItem>
 
       {/* Card Absences/Retards */}
       <CardItem
@@ -358,13 +399,16 @@ export default function CardConteneur() {
                     </span>
                   </div>
                   <p className={`text-xs mt-1 ${classes.textSub}`}>
-                    {absence.cours} – {absence.justifiee ? "Justifiée" : "Non justifiée"}
+                    {absence.cours} –{" "}
+                    {absence.justifiee ? "Justifiée" : "Non justifiée"}
                   </p>
                 </div>
               ))}
             </div>
           ) : (
-            <div className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}>
+            <div
+              className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}
+            >
               <div className="flex items-center gap-2">
                 <Clock size={12} className={classes.icon} />
                 <span className={`text-xs ${classes.textMain}`}>
@@ -375,91 +419,94 @@ export default function CardConteneur() {
           )
         }
       >
-        {
-          loadingAbcences ? (
-            <div className="space-y-4" >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <Skeleton className="h-4 w-32 rounded" />
-                  <Skeleton className="h-4 w-8 rounded" />
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <Skeleton className="h-4 w-40 rounded" />
-                  <Skeleton className="h-4 w-8 rounded" />
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <Skeleton className="h-4 w-20 rounded" />
-                  <Skeleton className="h-4 w-8 rounded" />
-                </div>
-              </div>
-              <Separator />
-              <div className="p-2 rounded border-l-4 bg-zinc-100 border-zinc-300">
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-4 w-4 rounded-full" />
-                  <Skeleton className="h-4 w-32 rounded" />
-                </div>
-                <Skeleton className="h-3 w-40 mt-1 rounded" />
-              </div>
-            </div>
-          ) : !PresenceDetails ? (
+        {loadingAbcences ? (
+          <div className="space-y-4">
             <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                Pas de données sur les absences
+              <div className="flex items-center justify-between text-xs">
+                <Skeleton className="h-4 w-32 rounded" />
+                <Skeleton className="h-4 w-8 rounded" />
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <Skeleton className="h-4 w-40 rounded" />
+                <Skeleton className="h-4 w-8 rounded" />
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <Skeleton className="h-4 w-20 rounded" />
+                <Skeleton className="h-4 w-8 rounded" />
               </div>
             </div>
-          ) : PresenceDetails.isError ? (
+            <Separator />
+            <div className="p-2 rounded border-l-4 bg-zinc-100 border-zinc-300">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-4 rounded-full" />
+                <Skeleton className="h-4 w-32 rounded" />
+              </div>
+              <Skeleton className="h-3 w-40 mt-1 rounded" />
+            </div>
+          </div>
+        ) : !PresenceDetails ? (
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              Pas de données sur les absences
+            </div>
+          </div>
+        ) : PresenceDetails.isError ? (
+          <div className="space-y-2">
+            <div
+              className="flex justify-between items-center"
+              style={{ color: "red" }}
+            >
+              Erreur API
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
             <div className="space-y-2">
-              <div className="flex justify-between items-center" style={{ color: 'red' }}>
-                Erreur API
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-800">Absences justifiées</span>
+                <span className="font-medium text-gray-800">
+                  {PresenceDetails.absencesJustifiees}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-800">Absences non justifiées</span>
+                <span className="font-medium text-destructive">
+                  {PresenceDetails.absencesNonJustifiees}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-800">Retards</span>
+                <span className="font-medium text-gray-800">
+                  {PresenceDetails.retards}
+                </span>
               </div>
             </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-800">Absences justifiées</span>
-                  <span className="font-medium text-gray-800">
-                    {PresenceDetails.absencesJustifiees}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-800">Absences non justifiées</span>
-                  <span className="font-medium text-destructive">
-                    {PresenceDetails.absencesNonJustifiees}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-800">Retards</span>
-                  <span className="font-medium text-gray-800">
-                    {PresenceDetails.retards}
-                  </span>
-                </div>
+            <Separator />
+            <div
+              className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}
+            >
+              <div className="flex items-center gap-2">
+                <Clock size={12} className={classes.icon} />
+                <span className={`text-xs ${classes.textMain}`}>
+                  Dernière absences:{" "}
+                  {PresenceDetails.absences[0].date +
+                    " " +
+                    (PresenceDetails.absences[0].heure || "")}
+                </span>
               </div>
-              <Separator />
-              <div
-                className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}
-              >
-                <div className="flex items-center gap-2">
-                  <Clock size={12} className={classes.icon} />
-                  <span className={`text-xs ${classes.textMain}`}>
-                    Dernière absences: {PresenceDetails.absences[0].date + " " + (PresenceDetails.absences[0].heure || "")}
-                  </span>
-                </div>
-                <p className={`text-xs mt-1 ${classes.textSub}`}>
-                  {PresenceDetails.absences.length > 0
-                    ? `${PresenceDetails.absences[0].cours} – ${PresenceDetails.absences[0].justifiee
-                      ? "Justifiée"
-                      : "Non justifiée"
+              <p className={`text-xs mt-1 ${classes.textSub}`}>
+                {PresenceDetails.absences.length > 0
+                  ? `${PresenceDetails.absences[0].cours} – ${
+                      PresenceDetails.absences[0].justifiee
+                        ? "Justifiée"
+                        : "Non justifiée"
                     }`
-                    : "Aucune absence"}
-                </p>
-              </div>
+                  : "Aucune absence"}
+              </p>
             </div>
-          )
-        }
-
-      </CardItem >
-
+          </div>
+        )}
+      </CardItem>
     </>
   );
 }

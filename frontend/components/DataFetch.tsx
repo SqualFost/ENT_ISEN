@@ -46,6 +46,7 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
       sujet: "Erreur de chargement",
       score: 0,
       isError: true,
+      nom: ""
     };
     return [errorNote];
   }
@@ -122,10 +123,159 @@ export async function loadEDT(start: number, end: number, EDTcomplet = false): P
         return planning;
       }
     }
-    const response = await api.getAgenda(start, end);
+    // const response = await api.getAgenda(start, end);
+    const response =
+      [
+        {
+          "id": "16523790",
+          "title": "08:00 - 10:00 - Algorithmique & Langage C - Sophie - MICHELON - 111 DS - Devoir surveillé - (02h00) -  - 16022691",
+          "start": "2024-11-04T08:00:00+0100",
+          "end": "2024-11-04T10:00:00+0100",
+          "editable": true,
+          "className": "est-epreuve"
+        },
+        {
+          "id": "16275938",
+          "title": "14:00 - 16:00 - Informatique - Amaury - AUGUSTE - 320 - Cours magistral - (02h00) -  - 1416799",
+          "start": "2024-11-04T14:00:00+0100",
+          "end": "2024-11-04T16:00:00+0100",
+          "editable": true,
+          "className": "CM"
+        },
+        {
+          "id": "16289494",
+          "title": "16:00 - 18:00 - Informatique - Amaury - AUGUSTE - 516 (Bachelor Cyber)  - Travaux dirigés - (02h00) -  - 1416799",
+          "start": "2024-11-04T16:00:00+0100",
+          "end": "2024-11-04T18:00:00+0100",
+          "editable": true,
+          "className": "TD"
+        },
+        {
+          "id": "16293902",
+          "title": "08:00 - 10:00 - Sécurité - Web - Aymeric - DELIENCOURT - 319 - Cours magistral - (02h00) -  - 3785460",
+          "start": "2024-11-05T08:00:00+0100",
+          "end": "2024-11-05T10:00:00+0100",
+          "editable": true,
+          "className": "CM"
+        },
+        {
+          "id": "16293398",
+          "title": "10:00 - 12:00 - WEBDEV - Quentin - HENRY - 512 - Cours magistral - (02h00) -  - 6246807",
+          "start": "2024-11-05T10:00:00+0100",
+          "end": "2024-11-05T12:00:00+0100",
+          "editable": true,
+          "className": "CM"
+        },
+        {
+          "id": "16322064",
+          "title": "13:00 - 14:00 - LV2 - Italien - Miriam - PORCU - 321 - Cours magistral - (01h00) -  - 14362792",
+          "start": "2024-11-05T13:00:00+0100",
+          "end": "2024-11-05T14:00:00+0100",
+          "editable": true,
+          "className": "CM"
+        },
+        {
+          "id": "16173115",
+          "title": "14:00 - 16:00 - Maths - Georges - THELOT - 516 (Bachelor Cyber)  - Travaux dirigés - (02h00) -  - 90447",
+          "start": "2024-11-05T14:00:00+0100",
+          "end": "2024-11-05T16:00:00+0100",
+          "editable": true,
+          "className": "TD"
+        },
+        {
+          "id": "16170432",
+          "title": "16:00 - 18:00 - Electronique - Frédéric - BRUOT - 404 - Travaux pratiques - (02h00) -  - 7677373",
+          "start": "2024-11-05T16:00:00+0100",
+          "end": "2024-11-05T18:00:00+0100",
+          "editable": true,
+          "className": "TP"
+        },
+        {
+          "id": "16169140",
+          "title": "08:00 - 10:00 - Electronique - Virginie - GADENNE - AMPHI - Cours magistral - (02h00) -  - 1643264",
+          "start": "2024-11-06T08:00:00+0100",
+          "end": "2024-11-06T10:00:00+0100",
+          "editable": true,
+          "className": "CM"
+        },
+        {
+          "id": "16168848",
+          "title": "10:00 - 12:00 - Maths - Georges - THELOT - AMPHI - Cours magistral - (02h00) -  - 90447",
+          "start": "2024-11-06T10:00:00+0100",
+          "end": "2024-11-06T12:00:00+0100",
+          "editable": true,
+          "className": "CM"
+        },
+        {
+          "id": "16344592",
+          "title": "14:00 - 16:00 - Electronique - Alain - BRAVAIX - 319 - Travaux dirigés - (02h00) -  - 90306",
+          "start": "2024-11-06T14:00:00+0100",
+          "end": "2024-11-06T16:00:00+0100",
+          "editable": true,
+          "className": "TD"
+        },
+        {
+          "id": "16185386",
+          "title": "08:00 - 10:00 - Physique - Elie - DE SAUVAGE - 318 - Cours magistral - (02h00) -  - 2905299",
+          "start": "2024-11-07T08:00:00+0100",
+          "end": "2024-11-07T10:00:00+0100",
+          "editable": true,
+          "className": "CM"
+        },
+        {
+          "id": "16345827",
+          "title": "10:00 - 12:00 - Physique - Elie - DE SAUVAGE - 320 - Travaux dirigés - (02h00) -  - 2905299",
+          "start": "2024-11-07T10:00:00+0100",
+          "end": "2024-11-07T12:00:00+0100",
+          "editable": true,
+          "className": "TD"
+        },
+        {
+          "id": "16173381",
+          "title": "08:00 - 10:00 - Maths - Georges - THELOT - 516 (Bachelor Cyber)  - Travaux dirigés - (02h00) -  - 90447",
+          "start": "2024-11-08T08:00:00+0100",
+          "end": "2024-11-08T10:00:00+0100",
+          "editable": true,
+          "className": "TD"
+        },
+        {
+          "id": "16134440",
+          "title": "10:00 - 12:00 - Anglais - Caroline - HOWSON - 515  - Cours magistral - (02h00) -  - 3104613",
+          "start": "2024-11-08T10:00:00+0100",
+          "end": "2024-11-08T12:00:00+0100",
+          "editable": true,
+          "className": "CM"
+        },
+        {
+          "id": "16171539",
+          "title": "13:00 - 15:00 - Sciences  Humaine Economique et Sociale - Frédéric - LONGOBARDI - 516 (Bachelor Cyber)  - Cours magistral - (02h00) -  - 3209809",
+          "start": "2024-11-08T13:00:00+0100",
+          "end": "2024-11-08T15:00:00+0100",
+          "editable": true,
+          "className": "CM"
+        },
+        {
+          "id": "16326674",
+          "title": "16:00 - 18:00 - Sport - Patrice - BAUTIAS -  - Cours magistral - (02h00) -  - 92630",
+          "start": "2024-11-08T16:00:00+0100",
+          "end": "2024-11-08T18:00:00+0100",
+          "editable": true,
+          "className": "CM"
+        }
+      ]
     // Stocker dans le sessionStorage
 
     console.log("EDT fetched:", response);
+    response.push(
+      {
+        "id": "16210288",
+        "title": "09:00 - 12:00 - Réunion - Amaury - AUGUSTE - AMPHI - Réunion - (03h00) -  - 1416799",
+        "start": "2024-09-03T09:00:00+0200",
+        "end": "2024-09-03T12:00:00+0200",
+        "editable": true,
+        "className": "REUNION"
+      },
+    )
     const planning: Cours[] = [];
     for (const item of response) {
       const title = item.title.split(" - ");
@@ -136,6 +286,7 @@ export async function loadEDT(start: number, end: number, EDTcomplet = false): P
           salle: title[6],
           isPause: false,
           isExam: item.className === "est-epreuve" ? true : false,
+          isEvent: item.className !== "est-epreuve" && item.className !== "CM" && item.className !== "TD" ? true : false,
           date: item.start.split("T")[0],
         });
       }
@@ -146,6 +297,7 @@ export async function loadEDT(start: number, end: number, EDTcomplet = false): P
           salle: title[5],
           isPause: false,
           isExam: item.className === "est-epreuve" ? true : false,
+          isEvent: item.className !== "est-epreuve" && item.className !== "CM" && item.className !== "TD" && item.className !=="TP" ? true : false,
           date: item.start.split("T")[0],
         });
       }
@@ -176,118 +328,136 @@ export async function loadEDT(start: number, end: number, EDTcomplet = false): P
 }
 
 export async function setEdtForAgenda() {
-  const start = new Date();
-  const end = new Date();
-  start.setHours(0, 0, 0, 0);
-  start.setDate(start.getDate() - start.getDay()); // Début de la semaine
-  end.setDate(end.getDate() + (6 - end.getDay())); // Fin de la semaine
-  end.setHours(23, 59, 59, 999);
-  //Timestamp milliseconds
-  const startTimestamp = Math.floor(start.getTime());
-  const endTimestamp = Math.floor(end.getTime());
-  // 1730679782000 1731108182000 semaine pour test
-  // const edt = await loadEDT(startTimestamp, endTimestamp, true);
-  const edt: Cours[] = [
-    {
-      heure: "08h00-10h00",
-      cours: "Herbology Class - Professor Sprout",
-      salle: "GreenHouse",
-      isPause: false,
-      isExam: false,
-      date: "2001-12-05", // Mercredi
-    },
-    {
-      heure: "10h00-12h00",
-      cours: "Potions Class - Professor Snape",
-      salle: "Dungeons",
-      isPause: false,
-      isExam: false,
-      date: "2001-12-05", // même jour pour déclencher ajout
-    },
-    {
-      heure: "13h00-15h00",
-      cours: "Potions Class 2 - Professor Snape",
-      salle: "Dungeons",
-      isPause: false,
-      isExam: false,
-      date: "2001-12-05", // même jour pour déclencher ajout
-    },
-    {
-      heure: "14h00-16h00",
-      cours: "Defense Against the Dark Arts",
-      salle: "Classroom 3C",
-      isPause: false,
-      isExam: false,
-      date: "2001-12-06", // Jeudi
-    }
-  ];
-  const joursSemaine = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+  try {
 
-  // Grouper les cours par date
-  const coursParDate = new Map<string, Cours[]>();
 
-  edt.forEach(cours => {
-    if (!coursParDate.has(cours.date)) {
-      coursParDate.set(cours.date, []);
-    }
-    coursParDate.get(cours.date)!.push(cours);
-  });
+    const start = new Date();
+    const end = new Date();
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - start.getDay()); // Début de la semaine
+    end.setDate(end.getDate() + (6 - end.getDay())); // Fin de la semaine
+    end.setHours(23, 59, 59, 999);
+    //Timestamp milliseconds
+    const startTimestamp = Math.floor(start.getTime());
+    const endTimestamp = Math.floor(end.getTime());
+    // 1730679782000 1731108182000 semaine pour test
+    const edt = await loadEDT(startTimestamp, endTimestamp, true);
 
-  const agenda: JourneeCours[] = [];
+    const joursSemaine = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 
-  // Traiter chaque jour
-  coursParDate.forEach((coursJour, date) => {
-    // Trier les cours par heure de début
-    coursJour.sort((a, b) => {
-      const heureA = parseInt(a.heure.split('h')[0]);
-      const heureB = parseInt(b.heure.split('h')[0]);
-      return heureA - heureB;
+    // Grouper les cours par date
+    const coursParDate = new Map<string, Cours[]>();
+
+    edt.forEach(cours => {
+      if (!coursParDate.has(cours.date)) {
+        coursParDate.set(cours.date, []);
+      }
+      coursParDate.get(cours.date)!.push(cours);
     });
 
-    // Obtenir le nom du jour de la semaine
-    const dateObj = new Date(date);
-    const jourIndex = dateObj.getDay();
-    const nomJour = joursSemaine[jourIndex === 0 ? 6 : jourIndex - 1]; // Dimanche = 0, donc ajuster
+    const agenda: JourneeCours[] = [];
 
-    const journee: JourneeCours = {
-      cours: [],
-      day: nomJour,
-      date: date
-    };
+    // Traiter chaque jour
+    coursParDate.forEach((coursJour, date) => {
+      // Trier les cours par heure de début
+      coursJour.sort((a, b) => {
+        const heureA = parseInt(a.heure.split('h')[0]);
+        const heureB = parseInt(b.heure.split('h')[0]);
+        return heureA - heureB;
+      });
 
-    // Ajouter les cours avec pauses automatiques
-    for (let i = 0; i < coursJour.length; i++) {
-      const coursActuel = coursJour[i];
-      journee.cours.push(coursActuel);
+      // Obtenir le nom du jour de la semaine
+      const dateObj = new Date(date);
+      const jourIndex = dateObj.getDay();
+      const nomJour = joursSemaine[jourIndex === 0 ? 6 : jourIndex - 1]; // Dimanche = 0, donc ajuster
 
-      // Vérifier s'il y a un cours suivant
-      if (i < coursJour.length - 1) {
-        const coursSuivant = coursJour[i + 1];
+      const journee: JourneeCours = {
+        cours: [],
+        day: nomJour,
+        date: date
+      };
 
-        // Extraire les heures de fin et de début
-        const finActuel = coursActuel.heure.split('-')[1];
-        const debutSuivant = coursSuivant.heure.split('-')[0];
+      // Ajouter les cours avec pauses automatiques
+      for (let i = 0; i < coursJour.length; i++) {
+        const coursActuel = coursJour[i];
+        journee.cours.push(coursActuel);
 
-        // Si les heures ne se suivent pas directement, ajouter une pause
-        if (finActuel !== debutSuivant) {
-          const pause: Cours = {
-            heure: `${finActuel}-${debutSuivant}`,
-            cours: "Pause",
-            salle: "",
-            isPause: true,
-            isExam: false,
-            date: coursActuel.date
-          };
-          journee.cours.push(pause);
+        // Vérifier s'il y a un cours suivant
+        if (i < coursJour.length - 1) {
+          const coursSuivant = coursJour[i + 1];
+
+          // Extraire les heures de fin et de début
+          const finActuel = coursActuel.heure.split('-')[1];
+          const debutSuivant = coursSuivant.heure.split('-')[0];
+
+          // Si les heures ne se suivent pas directement, ajouter une pause
+          if (finActuel !== debutSuivant) {
+            const pause: Cours = {
+              heure: `${finActuel}-${debutSuivant}`,
+              cours: "Pause",
+              salle: "",
+              isPause: true,
+              isExam: false,
+              date: coursActuel.date
+            };
+            journee.cours.push(pause);
+          }
         }
       }
-    }
 
-    agenda.push(journee);
-  });
+      agenda.push(journee);
+    });
 
-  // Trier l'agenda par date
-  agenda.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    // Trier l'agenda par date
+    agenda.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  return agenda;
+    return agenda;
+  }
+  catch (error) {
+    const errorCours: Cours = {
+      isError: true, // Indique que c'est une erreur
+      heure: "Erreur de chargement",
+      cours: "Erreur de chargement",
+      salle: "",
+      isPause: false,
+      isExam: false,
+      date: ""
+    };
+
+    console.error("Failed to load EDT data:", error);
+    return [errorCours]; // Retourne un cours d'erreur
+  }
+}
+
+export async function setEvent() {
+  try {
+    const start = new Date();
+    const end = new Date();
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - start.getDay()); // Début de la semaine
+    end.setDate(end.getDate() + (6 - end.getDay())); // Fin de la semaine
+    end.setHours(23, 59, 59, 999);
+    //Timestamp milliseconds
+    const startTimestamp = Math.floor(start.getTime());
+    const endTimestamp = Math.floor(end.getTime());
+    const event = await loadEDT(startTimestamp, endTimestamp, true);
+    console.log("Event :",event)
+    const eventList = event.filter(obj => obj.isEvent);
+    return eventList
+  }
+  catch (error) {
+    const errorCours: Cours = {
+      isError: true, // Indique que c'est une erreur
+      heure: "Erreur de chargement",
+      cours: "Erreur de chargement",
+      salle: "",
+      isPause: false,
+      isExam: false,
+      date: ""
+    };
+
+    console.error("Failed to load EDT data:", error);
+    return [errorCours]; // Retourne un cours d'erreur
+  }
+
 }
