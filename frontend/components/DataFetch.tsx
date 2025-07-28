@@ -1,5 +1,5 @@
 import ISEN_Api from "@/app/api/api";
-import { Cours, Presence, Note, Absences, JourneeCours } from "@/data";
+import { Cours, Presence, Note, Absences, JourneeCours, InfosPerso } from "@/data";
 import Cookies from "js-cookie";
 const api = new ISEN_Api();
 api.setToken(Cookies.get("token"));
@@ -20,6 +20,7 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
 
     // Sinon, appel API
     const response = await api.getNotations();
+    console.log("Response note",response)
     let notes: Note[] = [];
     for (let i = 0; i < response.length; i++) {
       const note = response[i];
@@ -42,6 +43,7 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
 
   } catch (error) {
     console.error("Failed to load notation data:", error);
+    
     const errorNote: Note = {
       sujet: "Erreur de chargement",
       score: 0,
@@ -297,7 +299,7 @@ export async function loadEDT(start: number, end: number, EDTcomplet = false): P
           salle: title[5],
           isPause: false,
           isExam: item.className === "est-epreuve" ? true : false,
-          isEvent: item.className !== "est-epreuve" && item.className !== "CM" && item.className !== "TD" && item.className !=="TP" ? true : false,
+          isEvent: item.className !== "est-epreuve" && item.className !== "CM" && item.className !== "TD" && item.className !== "TP" ? true : false,
           date: item.start.split("T")[0],
         });
       }
@@ -326,7 +328,99 @@ export async function loadEDT(start: number, end: number, EDTcomplet = false): P
     return [errorCours]; // Retourne un cours d'erreur
   }
 }
+export async function loadInfo(): Promise<InfosPerso | null> {
+  try {
+    const cached = sessionStorage.getItem("infos-persos-cache");
+    if (cached) {
+      const infos: InfosPerso = JSON.parse(cached);
+      console.log("Infos perso depuis le cache :", infos);
+      return infos;
+    }
 
+    const response = await api.getUserInfo();
+    const infos: InfosPerso = {
+      civilite: response.title,
+      nom: response.name,
+      prenom: response.firstName,
+      deuxiemePrenoms: response.middleNames,
+      sexe: response.sex,
+      dateNaissance: response.birthDate,
+      lieuNaissance: response.birthPlace,
+      nationalite: response.nationality,
+      adressePersonnelle: {
+        civilite: response.personalAddress.title,
+        nom: response.personalAddress.name,
+        ligneAdresse1: response.personalAddress.streetAddressLine1,
+        ligneAdresse2: response.personalAddress.streetAddressLine2,
+        ligneAdresse3: response.personalAddress.streetAddressLine3,
+        codePostalVille: response.personalAddress.postalCodeCity,
+        pays: response.personalAddress.country,
+      },
+      adresseParents: {
+        civilite: response.parentsAddress.title,
+        nom: response.parentsAddress.name,
+        ligneAdresse1: response.parentsAddress.streetAddressLine1,
+        ligneAdresse2: response.parentsAddress.streetAddressLine2,
+        ligneAdresse3: response.parentsAddress.streetAddressLine3,
+        codePostalVille: response.parentsAddress.postalCodeCity,
+        pays: response.parentsAddress.country,
+      },
+      adresseEnvoiBulletins: {
+        civilite: response.reportSendingAddress.title,
+        nom: response.reportSendingAddress.name,
+        ligneAdresse1: response.reportSendingAddress.streetAddressLine1,
+        ligneAdresse2: response.reportSendingAddress.streetAddressLine2,
+        ligneAdresse3: response.reportSendingAddress.streetAddressLine3,
+        codePostalVille: response.reportSendingAddress.postalCodeCity,
+        pays: response.reportSendingAddress.country,
+      },
+      adresseFacturation: {
+        civilite: response.billingAddress.title,
+        nom: response.billingAddress.name,
+        ligneAdresse1: response.billingAddress.streetAddressLine1,
+        ligneAdresse2: response.billingAddress.streetAddressLine2,
+        ligneAdresse3: response.billingAddress.streetAddressLine3,
+        codePostalVille: response.billingAddress.postalCodeCity,
+        pays: response.billingAddress.country,
+      },
+      telephonePersonnel: response.personalPhone,
+      telephoneParents: response.parentsPhone,
+      emailEnvoiBulletins: response.reportSendingEmail,
+      emailParents: response.parentsEmail,
+      emailPersonnel: response.personalEmail,
+      dernierDiplome: response.lastCertificate,
+      bac: {
+        academie: response.bac.academy,
+        annee: response.bac.year,
+        type: response.bac.type,
+        note: response.bac.note,
+        mention: response.bac.merit,
+        etablissement: response.bac.school,
+        codeEtablissement: response.bac.schoolCode,
+      },
+      pere: {
+        nom: response.father.name,
+        prenom: response.father.firstName,
+        profession: response.father.occupation,
+      },
+      mere: {
+        nom: response.mother.name,
+        prenom: response.mother.firstName,
+        profession: response.mother.occupation,
+      },
+      aValideReglementInterieur: response.haveAcknowledgeGlobalRules,
+      aValideCharteVieEtudiante: response.haveAcknowledgeStudentLifeCharter,
+      autoriseUtilisationImage: response.canIsenUsePersonalImage,
+    };
+    return infos;
+  } catch (error) {
+    console.error(
+      "Erreur lors du chargement des informations personnelles :",
+      error
+    );
+    return null;
+  }
+}
 export async function setEdtForAgenda() {
   try {
 
@@ -441,7 +535,7 @@ export async function setEvent() {
     const startTimestamp = Math.floor(start.getTime());
     const endTimestamp = Math.floor(end.getTime());
     const event = await loadEDT(startTimestamp, endTimestamp, true);
-    console.log("Event :",event)
+    console.log("Event :", event)
     const eventList = event.filter(obj => obj.isEvent);
     return eventList
   }
