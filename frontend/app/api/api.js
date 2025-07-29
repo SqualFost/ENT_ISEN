@@ -13,15 +13,17 @@ class ISEN_Api {
         method: "GET",
         headers: this.headers,
       });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      if (error.status == 500) {
+      if (response.status == 500) {
         window.location.href = '/login';
         return;
       }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+
       console.error("Error fetching data:", error);
       throw error;
     }
