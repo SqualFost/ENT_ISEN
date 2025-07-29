@@ -10,8 +10,14 @@ export type Note = {
   sujet: string;
   nom: string;
   score: number;
+  semestre: number;
   isError?: boolean; // Indique si la note est une erreur
 };
+export type NoteParMatiere = {
+  matiere: string;
+  notes: Note[];
+  isError?: boolean; // Indique si la matière est une erreur
+}
 export type Cours = {
   isError?: boolean; // Indique si le cours est une erreur
   heure: string;
@@ -22,6 +28,7 @@ export type Cours = {
   isExam: boolean;
   date: string; // Optionnel si la date n'est pas disponible
 };
+
 export type Absences = {
   date: string;
   cours: string;

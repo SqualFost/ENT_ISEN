@@ -1,5 +1,5 @@
 import ISEN_Api from "@/app/api/api";
-import { Cours, Presence, Note, Absences, JourneeCours, InfosPerso } from "@/data";
+import { Cours, Presence, Note, Absences, JourneeCours, InfosPerso, NoteParMatiere } from "@/data";
 import Cookies from "js-cookie";
 const api = new ISEN_Api();
 api.setToken(Cookies.get("token"));
@@ -20,15 +20,27 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
 
     // Sinon, appel API
     const response = await api.getNotations();
-    console.log("Response note",response)
+    console.log("Response note", response)
     let notes: Note[] = [];
     for (let i = 0; i < response.length; i++) {
       const note = response[i];
       const parts = note.name.split(" - ");
+      const semestre = parts[0] ? parts[0].replace(/\D/g, '') : 0; // Par défaut, semestre 1
+      let sujet = parts[1];
+      let nom = parts.slice(2).join(" - ");
+      if (nom == '') {//Pour les notes mal formatées (très casse couille)
+        const code_parts = note.code.split("_");
+        const sIndex = code_parts.findIndex((part: string) => part === "S" + semestre);
+        nom = code_parts.slice(sIndex + 2).join(" - ");
+        if (sujet.split(" ").length > 1) {
+          sujet = sujet.split(" ").slice(0, -1).join(" "); // Enlève le dernier mot
+        }
+      }
       notes.push({
-        nom: parts[2] || null,
-        sujet: parts[1],
+        nom: nom,
+        sujet: sujet,
         score: note.note,
+        semestre: semestre, // Par défaut, semestre 1
       });
     }
 
@@ -47,7 +59,8 @@ export async function loadNotation(estNoteRecente = true): Promise<Note[]> {
       sujet: "Erreur de chargement",
       score: 0,
       isError: true,
-      nom: ""
+      nom: "",
+      semestre: 1, // Par défaut, semestre 1
     };
     return [errorNote];
   }
@@ -124,159 +137,10 @@ export async function loadEDT(start: number, end: number, EDTcomplet = false): P
         return planning;
       }
     }
-    // const response = await api.getAgenda(start, end);
-    const response =
-      [
-        {
-          "id": "16523790",
-          "title": "08:00 - 10:00 - Algorithmique & Langage C - Sophie - MICHELON - 111 DS - Devoir surveillé - (02h00) -  - 16022691",
-          "start": "2024-11-04T08:00:00+0100",
-          "end": "2024-11-04T10:00:00+0100",
-          "editable": true,
-          "className": "est-epreuve"
-        },
-        {
-          "id": "16275938",
-          "title": "14:00 - 16:00 - Informatique - Amaury - AUGUSTE - 320 - Cours magistral - (02h00) -  - 1416799",
-          "start": "2024-11-04T14:00:00+0100",
-          "end": "2024-11-04T16:00:00+0100",
-          "editable": true,
-          "className": "CM"
-        },
-        {
-          "id": "16289494",
-          "title": "16:00 - 18:00 - Informatique - Amaury - AUGUSTE - 516 (Bachelor Cyber)  - Travaux dirigés - (02h00) -  - 1416799",
-          "start": "2024-11-04T16:00:00+0100",
-          "end": "2024-11-04T18:00:00+0100",
-          "editable": true,
-          "className": "TD"
-        },
-        {
-          "id": "16293902",
-          "title": "08:00 - 10:00 - Sécurité - Web - Aymeric - DELIENCOURT - 319 - Cours magistral - (02h00) -  - 3785460",
-          "start": "2024-11-05T08:00:00+0100",
-          "end": "2024-11-05T10:00:00+0100",
-          "editable": true,
-          "className": "CM"
-        },
-        {
-          "id": "16293398",
-          "title": "10:00 - 12:00 - WEBDEV - Quentin - HENRY - 512 - Cours magistral - (02h00) -  - 6246807",
-          "start": "2024-11-05T10:00:00+0100",
-          "end": "2024-11-05T12:00:00+0100",
-          "editable": true,
-          "className": "CM"
-        },
-        {
-          "id": "16322064",
-          "title": "13:00 - 14:00 - LV2 - Italien - Miriam - PORCU - 321 - Cours magistral - (01h00) -  - 14362792",
-          "start": "2024-11-05T13:00:00+0100",
-          "end": "2024-11-05T14:00:00+0100",
-          "editable": true,
-          "className": "CM"
-        },
-        {
-          "id": "16173115",
-          "title": "14:00 - 16:00 - Maths - Georges - THELOT - 516 (Bachelor Cyber)  - Travaux dirigés - (02h00) -  - 90447",
-          "start": "2024-11-05T14:00:00+0100",
-          "end": "2024-11-05T16:00:00+0100",
-          "editable": true,
-          "className": "TD"
-        },
-        {
-          "id": "16170432",
-          "title": "16:00 - 18:00 - Electronique - Frédéric - BRUOT - 404 - Travaux pratiques - (02h00) -  - 7677373",
-          "start": "2024-11-05T16:00:00+0100",
-          "end": "2024-11-05T18:00:00+0100",
-          "editable": true,
-          "className": "TP"
-        },
-        {
-          "id": "16169140",
-          "title": "08:00 - 10:00 - Electronique - Virginie - GADENNE - AMPHI - Cours magistral - (02h00) -  - 1643264",
-          "start": "2024-11-06T08:00:00+0100",
-          "end": "2024-11-06T10:00:00+0100",
-          "editable": true,
-          "className": "CM"
-        },
-        {
-          "id": "16168848",
-          "title": "10:00 - 12:00 - Maths - Georges - THELOT - AMPHI - Cours magistral - (02h00) -  - 90447",
-          "start": "2024-11-06T10:00:00+0100",
-          "end": "2024-11-06T12:00:00+0100",
-          "editable": true,
-          "className": "CM"
-        },
-        {
-          "id": "16344592",
-          "title": "14:00 - 16:00 - Electronique - Alain - BRAVAIX - 319 - Travaux dirigés - (02h00) -  - 90306",
-          "start": "2024-11-06T14:00:00+0100",
-          "end": "2024-11-06T16:00:00+0100",
-          "editable": true,
-          "className": "TD"
-        },
-        {
-          "id": "16185386",
-          "title": "08:00 - 10:00 - Physique - Elie - DE SAUVAGE - 318 - Cours magistral - (02h00) -  - 2905299",
-          "start": "2024-11-07T08:00:00+0100",
-          "end": "2024-11-07T10:00:00+0100",
-          "editable": true,
-          "className": "CM"
-        },
-        {
-          "id": "16345827",
-          "title": "10:00 - 12:00 - Physique - Elie - DE SAUVAGE - 320 - Travaux dirigés - (02h00) -  - 2905299",
-          "start": "2024-11-07T10:00:00+0100",
-          "end": "2024-11-07T12:00:00+0100",
-          "editable": true,
-          "className": "TD"
-        },
-        {
-          "id": "16173381",
-          "title": "08:00 - 10:00 - Maths - Georges - THELOT - 516 (Bachelor Cyber)  - Travaux dirigés - (02h00) -  - 90447",
-          "start": "2024-11-08T08:00:00+0100",
-          "end": "2024-11-08T10:00:00+0100",
-          "editable": true,
-          "className": "TD"
-        },
-        {
-          "id": "16134440",
-          "title": "10:00 - 12:00 - Anglais - Caroline - HOWSON - 515  - Cours magistral - (02h00) -  - 3104613",
-          "start": "2024-11-08T10:00:00+0100",
-          "end": "2024-11-08T12:00:00+0100",
-          "editable": true,
-          "className": "CM"
-        },
-        {
-          "id": "16171539",
-          "title": "13:00 - 15:00 - Sciences  Humaine Economique et Sociale - Frédéric - LONGOBARDI - 516 (Bachelor Cyber)  - Cours magistral - (02h00) -  - 3209809",
-          "start": "2024-11-08T13:00:00+0100",
-          "end": "2024-11-08T15:00:00+0100",
-          "editable": true,
-          "className": "CM"
-        },
-        {
-          "id": "16326674",
-          "title": "16:00 - 18:00 - Sport - Patrice - BAUTIAS -  - Cours magistral - (02h00) -  - 92630",
-          "start": "2024-11-08T16:00:00+0100",
-          "end": "2024-11-08T18:00:00+0100",
-          "editable": true,
-          "className": "CM"
-        }
-      ]
+    const response = await api.getAgenda(start, end);
     // Stocker dans le sessionStorage
 
     console.log("EDT fetched:", response);
-    response.push(
-      {
-        "id": "16210288",
-        "title": "09:00 - 12:00 - Réunion - Amaury - AUGUSTE - AMPHI - Réunion - (03h00) -  - 1416799",
-        "start": "2024-09-03T09:00:00+0200",
-        "end": "2024-09-03T12:00:00+0200",
-        "editable": true,
-        "className": "REUNION"
-      },
-    )
     const planning: Cours[] = [];
     for (const item of response) {
       const title = item.title.split(" - ");
@@ -287,7 +151,7 @@ export async function loadEDT(start: number, end: number, EDTcomplet = false): P
           salle: title[6],
           isPause: false,
           isExam: item.className === "est-epreuve" ? true : false,
-          isEvent: item.className !== "est-epreuve" && item.className !== "CM" && item.className !== "TD" ? true : false,
+          isEvent: item.className !== "est-epreuve" && item.className !== "CM" && item.className !== "TD" && item.className !== "TP" ? true : false,
           date: item.start.split("T")[0],
         });
       }
@@ -331,7 +195,7 @@ export async function loadInfo(): Promise<InfosPerso | null> {
   try {
     const cached = sessionStorage.getItem("infos-persos-cache");
     if (cached) {
-      const infos: InfosPerso = JSON.parse(cached);
+      const infos = JSON.parse(cached) as InfosPerso;
       console.log("Infos perso depuis le cache :", infos);
       return infos;
     }
@@ -411,6 +275,7 @@ export async function loadInfo(): Promise<InfosPerso | null> {
       aValideCharteVieEtudiante: response.haveAcknowledgeStudentLifeCharter,
       autoriseUtilisationImage: response.canIsenUsePersonalImage,
     };
+    sessionStorage.setItem("infos-persos-cache", JSON.stringify(infos));
     return infos;
   } catch (error) {
     console.error(
@@ -552,5 +417,22 @@ export async function setEvent() {
     console.error("Failed to load EDT data:", error);
     return [errorCours]; // Retourne un cours d'erreur
   }
-
 }
+
+export async function TriNoteParMatiere() {
+  const notes = await loadNotation(false);
+  let notesParMatiere: NoteParMatiere[] = [];
+  notes.forEach(note => {
+    const matiere = note.sujet;
+    let matiereExistante = notesParMatiere.find(m => m.matiere === matiere);
+    if (!matiereExistante) {
+      matiereExistante = { matiere: matiere, notes: [] };
+      notesParMatiere.push(matiereExistante);
+    }
+    matiereExistante.notes.push(note);
+  });
+
+  console.log("Notes par matière :", notesParMatiere);
+  return notesParMatiere;
+}
+TriNoteParMatiere()
