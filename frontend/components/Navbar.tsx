@@ -9,12 +9,13 @@ import {
 import {
   CircleUser,
   CalendarDays,
-  GraduationCap,
-  KeyRound,
-  Tickets,
-  File,
+  // GraduationCap,
+  // KeyRound,
+  // Tickets,
+  // File,
   User,
   LogOut,
+  Home,
 } from "lucide-react";
 import Cookies from "js-cookie";
 import { Button } from "./ui/button";
@@ -25,12 +26,13 @@ import { loadInfo } from "./DataFetch";
 import { Skeleton } from "./ui/skeleton";
 
 const liens = [
+  { icon: Home, label: "Accueil", href: "/" },
   { icon: CircleUser, label: "Mon compte", href: "#" },
-  { icon: CalendarDays, label: "Planning", href: "#" },
-  { icon: GraduationCap, label: "Scolarité", href: "#" },
-  { icon: KeyRound, label: "Inscriptions", href: "#" },
-  { icon: Tickets, label: "Evenements", href: "#" },
-  { icon: File, label: "Documents", href: "#" },
+  { icon: CalendarDays, label: "Planning", href: "agenda" },
+  // { icon: GraduationCap, label: "Scolarité", href: "#" },
+  // { icon: KeyRound, label: "Inscriptions", href: "#" },
+  // { icon: Tickets, label: "Evenements", href: "#" },
+  // { icon: File, label: "Documents", href: "#" },
 ];
 
 export default function Navbar() {

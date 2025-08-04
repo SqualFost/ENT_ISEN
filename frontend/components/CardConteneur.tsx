@@ -4,7 +4,7 @@ import CardItem from "@/components/CardItem";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { formatDate, cn, DateStrToTimeStamp } from "@/lib/utils";
+import { formatDate, DateStrToTimeStamp } from "@/lib/utils";
 import { Skeleton } from "./ui/skeleton";
 import { useEffect, useState } from "react";
 import {
@@ -15,14 +15,8 @@ import {
   Clock,
 } from "lucide-react";
 
-import { Cours, Note, Presence, evenements, ERDetails, classes } from "@/data";
-import {
-  loadAbscences,
-  loadEDT,
-  loadNotation,
-  setEdtForAgenda,
-  setEvent,
-} from "./DataFetch";
+import { Cours, Note, Presence, ERDetails, classes } from "@/data";
+import { loadAbscences, loadEDT, loadNotation, setEvent } from "./DataFetch";
 
 const notifications = [
   {
@@ -211,20 +205,25 @@ export default function CardConteneur() {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-red-500">
               <AlertCircle size={16} />
-              <span className="text-sm">Erreur lors du chargement des événements</span>
+              <span className="text-sm">
+                Erreur lors du chargement des événements
+              </span>
             </div>
           </div>
         ) : (
           <div className="space-y-3">
-            {Events.filter(event => event.isEvent).map((event, index) => (
+            {Events.filter((event) => event.isEvent).map((event, index) => (
               <div className="flex items-center gap-3" key={index}>
-                <div className="w-2 h-2 rounded-full bg-blue-400" /> {/* Couleur par défaut */}
+                <div className="w-2 h-2 rounded-full bg-blue-400" />{" "}
+                {/* Couleur par défaut */}
                 <div>
                   <p className="text-sm text-gray-800 font-medium">
-                    {event.cours} {/* Utilisation de cours si titre n'existe pas */}
+                    {event.cours}{" "}
+                    {/* Utilisation de cours si titre n'existe pas */}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {formatDate(DateStrToTimeStamp(event.date))} {event.heure && `à ${event.heure}`}
+                    {formatDate(DateStrToTimeStamp(event.date))}{" "}
+                    {event.heure && `à ${event.heure}`}
                   </p>
                 </div>
               </div>
@@ -316,10 +315,10 @@ export default function CardConteneur() {
         {/* Version condensée - jour actuel seulement */}
         {loadingEDT ? (
           <div className="space-y-1">
-            {[...Array(6)].map((_, index) => (
+            {[...Array(4)].map((_, index) => (
               <div
                 key={index}
-                className="flex items-center gap-3 p-2 rounded border-l-4 bg-blue-50 border-blue-400"
+                className="flex items-center gap-3 px-2 pt-2 rounded border-l-4 bg-blue-50 border-blue-400"
               >
                 <Skeleton className="h-4 w-16 rounded" />
                 <div className="flex-1">
