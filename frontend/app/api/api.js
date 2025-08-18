@@ -38,8 +38,11 @@ class ISEN_Api {
         },
         body: JSON.stringify({ username, password }),
       });
+      if (response.status == 504){
+        throw new Error("Erreur api ");
+      }
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Nom d'utilisateur ou mot de passe incorrect.`);
       }
       const data = await response.text();
       this.setToken(data);

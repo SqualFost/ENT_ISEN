@@ -22,7 +22,9 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [error, setError] = useState("");
-
+  function isNumericString(str: string): boolean {
+    return /^[0-9]+$/.test(str);
+  }
   // simulation de login attendant que l'api marche et que l'ent soit pas cassé encore
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -31,6 +33,7 @@ export default function LoginForm() {
     try {
       // Appel à l'API pour la connexion
       const response = await api.login(username, password);
+      //Si la réponse n'est pas un entier on renvoie une erreur 
       Cookies.set("token", response, {
         expires: 3600,
         secure: false, // Mettre à true en production
@@ -39,7 +42,7 @@ export default function LoginForm() {
       router.push("/"); // Redirection vers la page d'accueil après connexion réussie
     } catch (error) {
       console.error("Erreur lors de la connexion:", error);
-      setError("Nom d'utilisateur ou mot de passe incorrect.");
+      setError(typeof error === "string" ? error : (error instanceof Error ? error.message : "Une erreur est survenue"));
     } finally {
       setIsLoading(false);
     }
