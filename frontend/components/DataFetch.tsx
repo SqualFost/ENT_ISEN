@@ -8,6 +8,7 @@ import {
   InfosPerso,
   NoteParMatiere,
 } from "@/data";
+import { time } from "console";
 import Cookies from "js-cookie";
 const api = new ISEN_Api();
 api.setToken(Cookies.get("token"));
@@ -131,9 +132,23 @@ export async function loadEDT(
 ): Promise<Cours[]> {
   try {
     // Vérifie si le planning est déjà en cache
+    const lastFetch = sessionStorage.getItem("last-edt-fetch");
+    const { startTimestamp, endTimestamp } = getTimestampWeek();
+
+    // Convertir en nombre si lastFetch existe
+    const lastFetchNum = lastFetch ? Number(lastFetch) : 0;
+
+    // Vérifie si le dernier fetch est dans la semaine courante
+    if (lastFetchNum >= startTimestamp && lastFetchNum <= endTimestamp) {
+      console.log("✅ Le dernier fetch est dans la semaine courante");
+    } else {
+      loadEDT(start + 604800000, end + 604800000, EDTcomplet);
+    }
+
     if (EDTcomplet) {
       const cached = sessionStorage.getItem("edt-cache-complet");
       if (cached) {
+
         const planning = JSON.parse(cached) as Cours[];
         console.log("EDT complet from cache:", planning);
         return planning;
@@ -163,9 +178,9 @@ export async function loadEDT(
           isExam: item.className === "est-epreuve" ? true : false,
           isEvent:
             item.className !== "est-epreuve" &&
-            item.className !== "CM" &&
-            item.className !== "TD" &&
-            item.className !== "TP"
+              item.className !== "CM" &&
+              item.className !== "TD" &&
+              item.className !== "TP"
               ? true
               : false,
           date: item.start.split("T")[0],
@@ -179,15 +194,17 @@ export async function loadEDT(
           isExam: item.className === "est-epreuve" ? true : false,
           isEvent:
             item.className !== "est-epreuve" &&
-            item.className !== "CM" &&
-            item.className !== "TD" &&
-            item.className !== "TP"
+              item.className !== "CM" &&
+              item.className !== "TD" &&
+              item.className !== "TP"
               ? true
               : false,
           date: item.start.split("T")[0],
         });
       }
     }
+    //stock le timestamp du dernier fetch
+    sessionStorage.setItem("last-edt-fetch", Date.now().toString());
     if (EDTcomplet) {
       sessionStorage.setItem("edt-cache-complet", JSON.stringify(planning));
     } else {
@@ -306,15 +323,7 @@ export async function loadInfo(): Promise<InfosPerso | null> {
 }
 export async function setEdtForAgenda() {
   try {
-    const start = new Date();
-    const end = new Date();
-    start.setHours(0, 0, 0, 0);
-    start.setDate(start.getDate() - start.getDay()); // Début de la semaine
-    end.setDate(end.getDate() + (6 - end.getDay())); // Fin de la semaine
-    end.setHours(23, 59, 59, 999);
-    //Timestamp milliseconds
-    const startTimestamp = Math.floor(start.getTime());
-    const endTimestamp = Math.floor(end.getTime());
+    const { startTimestamp, endTimestamp } = getTimestampWeek();
     // 1730679782000 1731108182000 semaine pour test
     const edt = await loadEDT(startTimestamp, endTimestamp, true);
 
@@ -415,15 +424,7 @@ export async function setEdtForAgenda() {
 
 export async function setEvent() {
   try {
-    const start = new Date();
-    const end = new Date();
-    start.setHours(0, 0, 0, 0);
-    start.setDate(start.getDate() - start.getDay()); // Début de la semaine
-    end.setDate(end.getDate() + (6 - end.getDay())); // Fin de la semaine
-    end.setHours(23, 59, 59, 999);
-    //Timestamp milliseconds
-    const startTimestamp = Math.floor(start.getTime());
-    const endTimestamp = Math.floor(end.getTime());
+    const { startTimestamp, endTimestamp } = getTimestampWeek();
     const event = await loadEDT(startTimestamp, endTimestamp, true);
     console.log("Event :", event);
     const eventList = event.filter((obj) => obj.isEvent);
@@ -443,7 +444,19 @@ export async function setEvent() {
     return [errorCours]; // Retourne un cours d'erreur
   }
 }
+function getTimestampWeek() {
 
+  const start = new Date();
+  const end = new Date();
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - start.getDay()); // Début de la semaine
+  end.setDate(end.getDate() + (6 - end.getDay())); // Fin de la semaine
+  end.setHours(23, 59, 59, 999);
+  //Timestamp milliseconds
+  const startTimestamp = Math.floor(start.getTime());
+  const endTimestamp = Math.floor(end.getTime());
+  return { startTimestamp, endTimestamp };
+}
 export async function TriNoteParMatiere() {
   const notes = await loadNotation(false);
   const notesParMatiere: NoteParMatiere[] = [];
