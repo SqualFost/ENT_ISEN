@@ -102,6 +102,8 @@ export type Parent = {
   profession: string;
 };
 
+
+
 export const notes = [
   { sujet: "Mathématiques", score: "20/20" },
   { sujet: "Physique", score: "18/20" },
