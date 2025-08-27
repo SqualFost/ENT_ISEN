@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 import { Cours, Note, Presence, ERDetails, classes } from "@/data";
-import { loadAbscences, loadEDT, loadNotation, setEvent } from "./DataFetch";
+import { loadAbscences, loadEDTDay, loadNotation, setEvent } from "./DataFetch";
 
 const notifications = [
   {
@@ -64,37 +64,16 @@ export default function CardConteneur() {
 
   const [loadingEDT, setLoadingEDT] = useState(true);
   const [planning, setPlanning] = useState<Cours[]>([]);
+
   useEffect(() => {
     const fetchEDT = async () => {
-      const now = new Date();
-      // Aujourd’hui à 00h00:00.000
-      const startOfDay = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        0,
-        0,
-        0,
-        0
-      ).getTime();
-
-      // Aujourd’hui à 23h59:59.999
-      const endOfDay = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        23,
-        59,
-        59,
-        999
-      ).getTime();
-      const result = await loadEDT(startOfDay, endOfDay);
-
+      const result = await loadEDTDay();
       setPlanning(result || []);
       setLoadingEDT(false);
     };
     fetchEDT();
   }, []);
+
 
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [Events, setEventList] = useState<Cours[] | null>(null);
@@ -218,7 +197,7 @@ export default function CardConteneur() {
                 {/* Couleur par défaut */}
                 <div>
                   <p className="text-sm text-gray-800 font-medium">
-                    {event.cours}{" "}
+                    {event.matiere}{" "}
                     {/* Utilisation de cours si titre n'existe pas */}
                   </p>
                   <p className="text-xs text-gray-500">
@@ -348,26 +327,24 @@ export default function CardConteneur() {
             {planning.map((item, index) => (
               <div
                 key={index}
-                className={`flex items-center gap-3 p-2 rounded border-l-4 ${
-                  item.isPause
-                    ? "bg-gray-50 border-gray-300"
-                    : "bg-blue-50 border-blue-400"
-                }`}
+                className={`flex items-center gap-3 p-2 rounded border-l-4 ${item.isPause
+                  ? "bg-gray-50 border-gray-300"
+                  : "bg-blue-50 border-blue-400"
+                  }`}
               >
                 <div
-                  className={`text-xs font-medium w-16 ${
-                    item.isPause ? "text-gray-500" : "text-blue-600"
-                  }`}
+                  className={`text-xs font-medium w-16 ${item.isPause ? "text-gray-500" : "text-blue-600"
+                    }`}
                 >
                   {item.heure}
                 </div>
                 <div className="flex-1">
                   {item.isPause ? (
-                    <p className="text-sm text-gray-600 italic">{item.cours}</p>
+                    <p className="text-sm text-gray-600 italic">{item.matiere}</p>
                   ) : (
                     <>
                       <p className="text-sm font-medium text-blue-800">
-                        {item.cours}
+                        {item.matiere}
                       </p>
                       <p className="text-xs text-blue-600">{item.salle}</p>
                     </>
@@ -495,11 +472,10 @@ export default function CardConteneur() {
               </div>
               <p className={`text-xs mt-1 ${classes.textSub}`}>
                 {PresenceDetails.absences.length > 0
-                  ? `${PresenceDetails.absences[0].cours} – ${
-                      PresenceDetails.absences[0].justifiee
-                        ? "Justifiée"
-                        : "Non justifiée"
-                    }`
+                  ? `${PresenceDetails.absences[0].cours} – ${PresenceDetails.absences[0].justifiee
+                    ? "Justifiée"
+                    : "Non justifiée"
+                  }`
                   : "Aucune absence"}
               </p>
             </div>

@@ -8,7 +8,6 @@ import {
   InfosPerso,
   NoteParMatiere,
 } from "@/data";
-import { time } from "console";
 import Cookies from "js-cookie";
 const api = new ISEN_Api();
 api.setToken(Cookies.get("token"));
@@ -125,108 +124,90 @@ export async function loadAbscences() {
     return errorPresence; // Retourne une présence d'erreur
   }
 }
-export async function loadEDT(
-  start: number,
-  end: number,
-  EDTcomplet = false
-): Promise<Cours[]> {
+// Appel API brut et parsing
+export async function fetchEDTApi(start: number, end: number): Promise<Cours[]> {
   try {
-    // Vérifie si le planning est déjà en cache
-    const lastFetch = sessionStorage.getItem("last-edt-fetch");
-    const { startTimestamp, endTimestamp } = getTimestampWeek();
-
-    // Convertir en nombre si lastFetch existe
-    const lastFetchNum = lastFetch ? Number(lastFetch) : 0;
-
-    // Vérifie si le dernier fetch est dans la semaine courante
-    if (lastFetchNum >= startTimestamp && lastFetchNum <= endTimestamp) {
-      console.log("✅ Le dernier fetch est dans la semaine courante");
-    } else {
-      loadEDT(start + 604800000, end + 604800000, EDTcomplet);
-    }
-
-    if (EDTcomplet) {
-      const cached = sessionStorage.getItem("edt-cache-complet");
-      if (cached) {
-
-        const planning = JSON.parse(cached) as Cours[];
-        console.log("EDT complet from cache:", planning);
-        return planning;
-      }
-    } else {
-      const cached = sessionStorage.getItem("edt-cache");
-      if (cached) {
-        const planning = JSON.parse(cached) as Cours[];
-
-        console.log("EDT from cache:", planning);
-        return planning;
-      }
-    }
     const response = await api.getAgenda(start, end);
-    // Stocker dans le sessionStorage
-
-    console.log("EDT fetched:", response);
     const planning: Cours[] = [];
+
     for (const item of response) {
       const title = item.title.split(" - ");
       if (title.length === 11) {
         planning.push({
           heure: title[0] + "-" + title[1],
-          cours: title[2] + " " + title[3],
+          matiere: title[2] + " " + title[3],
           salle: title[6],
-          isPause: false,
-          isExam: item.className === "est-epreuve" ? true : false,
-          isEvent:
-            item.className !== "est-epreuve" &&
-              item.className !== "CM" &&
-              item.className !== "TD" &&
-              item.className !== "TP"
-              ? true
-              : false,
+          isExam: item.className === "est-epreuve",
+          isEvent: item.className !== "est-epreuve" &&
+            item.className !== "CM" &&
+            item.className !== "TD" &&
+            item.className !== "TP",
           date: item.start.split("T")[0],
+          prof: "",
+          jour: "",
+          duree: getDureeFromHeure(title[0] + "-" + title[1])
         });
       } else {
         planning.push({
           heure: title[0] + "-" + title[1],
-          cours: title[2],
+          matiere: title[2],
           salle: title[5],
           isPause: false,
-          isExam: item.className === "est-epreuve" ? true : false,
-          isEvent:
-            item.className !== "est-epreuve" &&
-              item.className !== "CM" &&
-              item.className !== "TD" &&
-              item.className !== "TP"
-              ? true
-              : false,
+          isExam: item.className === "est-epreuve",
+          isEvent: item.className !== "est-epreuve" &&
+            item.className !== "CM" &&
+            item.className !== "TD" &&
+            item.className !== "TP",
           date: item.start.split("T")[0],
+          prof: "",
+          jour: "",
+          duree: getDureeFromHeure(title[0] + "-" + title[1])
         });
       }
     }
-    //stock le timestamp du dernier fetch
-    sessionStorage.setItem("last-edt-fetch", Date.now().toString());
-    if (EDTcomplet) {
-      sessionStorage.setItem("edt-cache-complet", JSON.stringify(planning));
-    } else {
-      sessionStorage.setItem("edt-cache", JSON.stringify(planning));
-    }
+
     return planning;
   } catch (error) {
-    // En cas d'erreur, retourner un tableau vide ou une valeur par défaut
+    console.error("Failed to fetch EDT data:", error);
+
     const errorCours: Cours = {
-      isError: true, // Indique que c'est une erreur
+      isError: true,
       heure: "Erreur de chargement",
-      cours: "Erreur de chargement",
+      matiere: "Erreur de chargement",
       salle: "",
       isPause: false,
       isExam: false,
       date: "",
+      prof: "",
+      jour: "",
+      duree: 0
     };
 
-    console.error("Failed to load EDT data:", error);
-    return [errorCours]; // Retourne un cours d'erreur
+    return [errorCours];
   }
 }
+export async function loadEDTDay(): Promise<Cours[]> {
+  const now = new Date();
+
+  // Aujourd’hui à 00h00:00.000
+  const startOfDay = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    0, 0, 0, 0
+  ).getTime();
+
+  // Aujourd’hui à 23h59:59.999
+  const endOfDay = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    23, 59, 59, 999
+  ).getTime();
+
+  return await fetchEDTApi(startOfDay, endOfDay);
+}
+
 export async function loadInfo(): Promise<InfosPerso | null> {
   try {
     const cached = sessionStorage.getItem("infos-persos-cache");
@@ -323,9 +304,17 @@ export async function loadInfo(): Promise<InfosPerso | null> {
 }
 export async function setEdtForAgenda() {
   try {
-    const { startTimestamp, endTimestamp } = getTimestampWeek();
+    const start = new Date();
+    const end = new Date();
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - start.getDay()); // Début de la semaine
+    end.setDate(end.getDate() + (6 - end.getDay())); // Fin de la semaine
+    end.setHours(23, 59, 59, 999);
+    //Timestamp milliseconds
+    const startTimestamp = Math.floor(start.getTime());
+    const endTimestamp = Math.floor(end.getTime());
     // 1730679782000 1731108182000 semaine pour test
-    const edt = await loadEDT(startTimestamp, endTimestamp, true);
+    const edt = await fetchEDTApi(startTimestamp, endTimestamp);
 
     const joursSemaine = [
       "Lundi",
@@ -386,11 +375,14 @@ export async function setEdtForAgenda() {
           if (finActuel !== debutSuivant) {
             const pause: Cours = {
               heure: `${finActuel}-${debutSuivant}`,
-              cours: "Pause",
+              matiere: "Pause",
               salle: "",
               isPause: true,
               isExam: false,
               date: coursActuel.date,
+              prof: "",
+              jour: "",
+              duree: getDureeFromHeure(finActuel + "-" + debutSuivant)
             };
             journee.cours.push(pause);
           }
@@ -410,11 +402,14 @@ export async function setEdtForAgenda() {
     const errorCours: Cours = {
       isError: true, // Indique que c'est une erreur
       heure: "Erreur de chargement",
-      cours: "Erreur de chargement",
+      matiere: "Erreur de chargement",
       salle: "",
       isPause: false,
       isExam: false,
       date: "",
+      prof: "",
+      jour: "",
+      duree: 0
     };
 
     console.error("Failed to load EDT data:", error);
@@ -424,8 +419,16 @@ export async function setEdtForAgenda() {
 
 export async function setEvent() {
   try {
-    const { startTimestamp, endTimestamp } = getTimestampWeek();
-    const event = await loadEDT(startTimestamp, endTimestamp, true);
+    const start = new Date();
+    const end = new Date();
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - start.getDay()); // Début de la semaine
+    end.setDate(end.getDate() + (6 - end.getDay())); // Fin de la semaine
+    end.setHours(23, 59, 59, 999);
+    //Timestamp milliseconds
+    const startTimestamp = Math.floor(start.getTime());
+    const endTimestamp = Math.floor(end.getTime());
+    const event = await fetchEDTApi(startTimestamp, endTimestamp);
     console.log("Event :", event);
     const eventList = event.filter((obj) => obj.isEvent);
     return eventList;
@@ -433,30 +436,21 @@ export async function setEvent() {
     const errorCours: Cours = {
       isError: true, // Indique que c'est une erreur
       heure: "Erreur de chargement",
-      cours: "Erreur de chargement",
+      matiere: "Erreur de chargement",
       salle: "",
       isPause: false,
       isExam: false,
       date: "",
+      prof: "",
+      jour: "",
+      duree: 0
     };
 
     console.error("Failed to load EDT data:", error);
     return [errorCours]; // Retourne un cours d'erreur
   }
 }
-function getTimestampWeek() {
 
-  const start = new Date();
-  const end = new Date();
-  start.setHours(0, 0, 0, 0);
-  start.setDate(start.getDate() - start.getDay()); // Début de la semaine
-  end.setDate(end.getDate() + (6 - end.getDay())); // Fin de la semaine
-  end.setHours(23, 59, 59, 999);
-  //Timestamp milliseconds
-  const startTimestamp = Math.floor(start.getTime());
-  const endTimestamp = Math.floor(end.getTime());
-  return { startTimestamp, endTimestamp };
-}
 export async function TriNoteParMatiere() {
   const notes = await loadNotation(false);
   const notesParMatiere: NoteParMatiere[] = [];
@@ -473,4 +467,15 @@ export async function TriNoteParMatiere() {
   console.log("Notes par matière :", notesParMatiere);
   return notesParMatiere;
 }
-TriNoteParMatiere();
+function getDureeFromHeure(heure: string): number {
+  const [start, end] = heure.split("-");
+  const [startHour, startMinute] = start.split(":").map(Number);
+  const [endHour, endMinute] = end.split(":").map(Number);
+
+
+  let duree = endHour - startHour;
+  if (endMinute < startMinute) {
+    duree -= 1; // Si les minutes de fin sont inférieures aux minutes de début, on retire une heure
+  }
+  return duree;
+}

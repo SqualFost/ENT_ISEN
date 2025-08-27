@@ -1,5 +1,9 @@
+"use client";
+import { fetchEDTApi } from "@/components/DataFetch";
 import Navbar from "@/components/Navbar";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Cours } from "@/data";
+import { useEffect, useState } from "react";
 
 const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 const heures = [
@@ -16,15 +20,38 @@ const heures = [
   "18:00",
 ];
 
-// Exemple de planning avec durée
-const cours = [
-  { jour: "Lundi", heure: "10:00", duree: 2, matiere: "Maths", prof: "M. Dupont" },   // 10h-12h
-  { jour: "Mardi", heure: "14:00", duree: 1, matiere: "Physique", prof: "Mme Durand" }, // 14h-15h
-  { jour: "Jeudi", heure: "09:00", duree: 3, matiere: "Histoire", prof: "M. Martin" }, // 9h-12h
-  { jour: "Vendredi", heure: "16:00", duree: 2, matiere: "Anglais", prof: "Mme Smith" }, // 16h-18h
-];
+// Convertit un "date" de l’API → jour en toutes lettres
+function getJourLabel(dateStr: string): string {
+  const d = new Date(dateStr);
+  const dayIndex = d.getDay(); // 0 = Dimanche, 1 = Lundi ...
+  return jours[dayIndex - 1] || "";
+}
 
 export default function AgendaPage() {
+  const [loadingEDT, setLoadingEDT] = useState(true);
+  const [planning, setPlanning] = useState<Cours[]>([]);
+
+  useEffect(() => {
+    const fetchEDT = async () => {
+
+
+      const result = await fetchEDTApi(1733724797000, 1734156797000);
+      setPlanning(result || []);
+      setLoadingEDT(false);
+    };
+    fetchEDT();
+  }, []);
+
+  if (loadingEDT) {
+    return (
+      <div className="flex items-center justify-center h-screen w-screen bg-gray-100">
+        <div className="text-blue-600 font-bold text-xl animate-pulse">
+          Chargement de l’emploi du temps...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col lg:flex-row lg:h-screen p-4 gap-4 bg-gray-100">
       <Navbar />
@@ -59,24 +86,25 @@ export default function AgendaPage() {
 
                   {/* Colonnes jours */}
                   {jours.map((jour) => {
-                    // Vérifie si un cours commence à cette heure
-                    const coursCell = cours.find(
-                      (c) => c.jour === jour && c.heure === heure
+                    // Vérifie si un cours commence à cette heure précise
+                    const coursCell = planning.find(
+                      (c) =>
+                        getJourLabel(c.date) === jour &&
+                        c.heure.startsWith(heure)
                     );
 
                     // Vérifie si la case est couverte par un cours déjà affiché
-                    const coursEnCours = cours.find((c) => {
-                      const startIndex = heures.indexOf(c.heure);
-                      const endIndex = startIndex + c.duree - 1;
-                      return (
-                        c.jour === jour &&
-                        i > startIndex &&
-                        i <= endIndex
-                      );
+                    const coursEnCours = planning.find((c) => {
+                      if (getJourLabel(c.date) !== jour) return false;
+
+                      const startIndex = heures.indexOf(c.heure.split("-")[0]);
+                      const endIndex = startIndex + (c.duree || 1) - 1;
+
+                      return i > startIndex && i <= endIndex;
                     });
 
                     if (coursEnCours && !coursCell) {
-                      // On ne met pas de case : déjà fusionnée par rowSpan
+                      // La case est dans la plage d’un cours déjà rendu → on saute
                       return null;
                     }
 
@@ -84,26 +112,15 @@ export default function AgendaPage() {
                       <td
                         key={jour + heure}
                         className="border border-gray-300 h-16"
-                        rowSpan={coursCell ? coursCell.duree : 1}
+                        rowSpan={coursCell ? coursCell.duree || 1 : 1}
                       >
                         {coursCell ? (
-                          <div className="bg-blue-500 text-white rounded-lg px-2 py-1 text-xs text-center shadow w-full h-full flex flex-col justify-center">
-                            <div className="font-semibold">
-                              {coursCell.matiere}
-                            </div>
-                            <div className="text-[10px] opacity-80">
-                              {coursCell.prof}
-                            </div>
-                            <div className="text-[10px] opacity-70">
-                              {coursCell.heure} →{" "}
-                              {
-                                heures[
-                                heures.indexOf(coursCell.heure) +
-                                coursCell.duree
-                                ]
-                              }
-                            </div>
+                          <div className="bg-blue-500 text-white rounded-lg px-2 py-1 text-xs text-center shadow w-full h-full flex flex-col justify-center overflow-hidden">
+                            <div className="font-semibold truncate whitespace-nowrap">{coursCell.matiere}</div>
+                            <div className="text-[10px] opacity-70 truncate">{coursCell.salle}</div>
+                            <div className="text-[10px] opacity-70 truncate">{coursCell.heure}</div>
                           </div>
+
                         ) : null}
                       </td>
                     );

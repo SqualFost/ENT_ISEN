@@ -21,12 +21,15 @@ export type NoteParMatiere = {
 export type Cours = {
   isError?: boolean; // Indique si le cours est une erreur
   heure: string;
-  cours: string;
-  salle?: string ;
-  isPause: boolean;
-  isEvent? : boolean;
+  matiere: string;
+  prof: string;
+  salle: string;
+  isEvent?: boolean;
   isExam: boolean;
-  date: string; // Optionnel si la date n'est pas disponible
+  jour: string;
+  isPause?: boolean;
+  date: string;
+  duree: number; // Durée en heures
 };
 
 export type Absences = {
@@ -174,19 +177,19 @@ export const PresenceDetails = {
 
 export const classes = PresenceDetails.derniereAbsence[0].justifiee
   ? {
-      bg: "bg-yellow-50",
-      border: "border-yellow-400",
-      icon: "text-yellow-500",
-      textMain: "text-yellow-700",
-      textSub: "text-yellow-600",
-    }
+    bg: "bg-yellow-50",
+    border: "border-yellow-400",
+    icon: "text-yellow-500",
+    textMain: "text-yellow-700",
+    textSub: "text-yellow-600",
+  }
   : {
-      bg: "bg-red-50",
-      border: "border-red-400",
-      icon: "text-red-500",
-      textMain: "text-red-700",
-      textSub: "text-red-600",
-    };
+    bg: "bg-red-50",
+    border: "border-red-400",
+    icon: "text-red-500",
+    textMain: "text-red-700",
+    textSub: "text-red-600",
+  };
 
 export const notifColors = {
   red: {
