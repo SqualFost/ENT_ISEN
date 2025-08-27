@@ -16,7 +16,12 @@ import {
 } from "lucide-react";
 
 import { Cours, Note, Presence, ERDetails, classes } from "@/data";
-import { loadAbscences, loadEDT, loadNotation, setEvent } from "./DataFetch";
+import {
+  loadAbscences,
+  fetchEDTApi,
+  loadNotation,
+  setEvent,
+} from "./DataFetch";
 
 const notifications = [
   {
@@ -64,32 +69,10 @@ export default function CardConteneur() {
 
   const [loadingEDT, setLoadingEDT] = useState(true);
   const [planning, setPlanning] = useState<Cours[]>([]);
+
   useEffect(() => {
     const fetchEDT = async () => {
-      const now = new Date();
-      // Aujourd’hui à 00h00:00.000
-      const startOfDay = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        0,
-        0,
-        0,
-        0
-      ).getTime();
-
-      // Aujourd’hui à 23h59:59.999
-      const endOfDay = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        23,
-        59,
-        59,
-        999
-      ).getTime();
-      const result = await loadEDT(startOfDay, endOfDay);
-
+      const result = await fetchEDTApi(1733724797000, 1733774797000);
       setPlanning(result || []);
       setLoadingEDT(false);
     };
@@ -218,7 +201,7 @@ export default function CardConteneur() {
                 {/* Couleur par défaut */}
                 <div>
                   <p className="text-sm text-gray-800 font-medium">
-                    {event.cours}{" "}
+                    {event.matiere}{" "}
                     {/* Utilisation de cours si titre n'existe pas */}
                   </p>
                   <p className="text-xs text-gray-500">
@@ -363,11 +346,13 @@ export default function CardConteneur() {
                 </div>
                 <div className="flex-1">
                   {item.isPause ? (
-                    <p className="text-sm text-gray-600 italic">{item.cours}</p>
+                    <p className="text-sm text-gray-600 italic">
+                      {item.matiere}
+                    </p>
                   ) : (
                     <>
                       <p className="text-sm font-medium text-blue-800">
-                        {item.cours}
+                        {item.matiere}
                       </p>
                       <p className="text-xs text-blue-600">{item.salle}</p>
                     </>
