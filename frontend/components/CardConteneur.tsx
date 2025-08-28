@@ -21,6 +21,7 @@ import {
   fetchEDTApi,
   loadNotation,
   setEvent,
+  loadEDTDay,
 } from "./DataFetch";
 
 const notifications = [
@@ -72,7 +73,7 @@ export default function CardConteneur() {
 
   useEffect(() => {
     const fetchEDT = async () => {
-      const result = await fetchEDTApi(1733724797000, 1733774797000);
+      const result = await loadEDTDay();
       setPlanning(result || []);
       setLoadingEDT(false);
     };

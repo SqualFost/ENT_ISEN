@@ -222,3 +222,133 @@ export const notifColors = {
     },
   },
 };
+export interface Note_temp {
+  nom: string
+  sous_matiere_id: string
+  score: string
+  coeff: string
+}
+
+export interface SousMatiere {
+  id: string
+  nom: string
+  coefficient?: number
+  notes: Note_temp[]
+}
+
+export interface Matiere {
+  id: string
+  nom: string
+  coefficient: number
+  sous_matieres: SousMatiere[]
+}
+
+export interface Module {
+  id: string
+  nom: string
+  matieres: Matiere[]
+}
+
+export const modulesData: Module[] = [
+  {
+    id: "1",
+    nom: "Informatique",
+    matieres: [
+      {
+        id: "1",
+        nom: "Programmation Web",
+        coefficient: 3,
+        sous_matieres: [
+          {
+            id: "1",
+            nom: "Examens",
+            coefficient: 6,
+            notes: [
+              { nom: "Examen 1", sous_matiere_id: "1", score: "16.50", coeff: "3" },
+              { nom: "Examen 2", sous_matiere_id: "1", score: "14.00", coeff: "3" },
+            ],
+          },
+          {
+            id: "2",
+            nom: "TP",
+            coefficient: 6,
+            notes: [
+              { nom: "TP 1 - HTML/CSS", sous_matiere_id: "2", score: "18.00", coeff: "2" },
+              { nom: "TP 2 - JavaScript", sous_matiere_id: "2", score: "15.50", coeff: "2" },
+              { nom: "TP 3 - React", sous_matiere_id: "2", score: "17.00", coeff: "2" },
+            ],
+          },
+          {
+            id: "3",
+            nom: "IE (Interrogation Écrite)",
+            coefficient: 2,
+            notes: [
+              { nom: "IE 1", sous_matiere_id: "3", score: "12.00", coeff: "1" },
+              { nom: "IE 2", sous_matiere_id: "3", score: "15.00", coeff: "1" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "2",
+        nom: "Base de Données",
+        coefficient: 2,
+        sous_matieres: [
+          {
+            id: "4",
+            nom: "Examens",
+            coefficient: 4,
+            notes: [{ nom: "Examen SQL", sous_matiere_id: "4", score: "13.50", coeff: "4" }],
+          },
+          {
+            id: "5",
+            nom: "TP",
+            coefficient: 4,
+            notes: [
+              { nom: "TP MySQL", sous_matiere_id: "5", score: "16.00", coeff: "2" },
+              { nom: "TP PostgreSQL", sous_matiere_id: "5", score: "14.50", coeff: "2" },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "2",
+    nom: "Mathématiques",
+    matieres: [
+      {
+        id: "3",
+        nom: "Analyse",
+        coefficient: 4,
+        sous_matieres: [
+          {
+            id: "6",
+            nom: "Examens",
+            coefficient: 7,
+            notes: [
+              { nom: "Partiel", sous_matiere_id: "6", score: "11.00", coeff: "3" },
+              { nom: "Final", sous_matiere_id: "6", score: "13.50", coeff: "4" },
+            ],
+          },
+          {
+            id: "7",
+            nom: "TD",
+            coefficient: 2,
+            notes: [
+              { nom: "TD 1", sous_matiere_id: "7", score: "15.00", coeff: "1" },
+              { nom: "TD 2", sous_matiere_id: "7", score: "16.50", coeff: "1" },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+]
+
+export const notesNonAssignees: Note_temp[] = [
+  { nom: "Quiz Surprise", sous_matiere_id: "-1", score: "17.50", coeff: "1" },
+  { nom: "Projet Final", sous_matiere_id: "-1", score: "19.00", coeff: "5" },
+  { nom: "Présentation Orale", sous_matiere_id: "-1", score: "14.50", coeff: "2" },
+  { nom: "Devoir Maison", sous_matiere_id: "-1", score: "16.00", coeff: "2" },
+]
