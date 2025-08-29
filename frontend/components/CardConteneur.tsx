@@ -332,16 +332,14 @@ export default function CardConteneur() {
             {planning.map((item, index) => (
               <div
                 key={index}
-                className={`flex items-center gap-3 p-2 rounded border-l-4 ${
-                  item.isPause
+                className={`flex items-center gap-3 p-2 rounded border-l-4 ${item.isPause
                     ? "bg-gray-50 border-gray-300"
                     : "bg-blue-50 border-blue-400"
-                }`}
+                  }`}
               >
                 <div
-                  className={`text-xs font-medium w-16 ${
-                    item.isPause ? "text-gray-500" : "text-blue-600"
-                  }`}
+                  className={`text-xs font-medium w-16 ${item.isPause ? "text-gray-500" : "text-blue-600"
+                    }`}
                 >
                   {item.heure}
                 </div>
@@ -474,18 +472,18 @@ export default function CardConteneur() {
                 <Clock size={12} className={classes.icon} />
                 <span className={`text-xs ${classes.textMain}`}>
                   Dernière absences:{" "}
-                  {PresenceDetails.absences[0].date +
-                    " " +
-                    (PresenceDetails.absences[0].heure || "")}
+                  {PresenceDetails?.absences?.[0]
+                    ? `${PresenceDetails.absences[0].date} ${PresenceDetails.absences[0].heure || ""}`
+                    : "Aucune absences"}
+
                 </span>
               </div>
               <p className={`text-xs mt-1 ${classes.textSub}`}>
                 {PresenceDetails.absences.length > 0
-                  ? `${PresenceDetails.absences[0].cours} – ${
-                      PresenceDetails.absences[0].justifiee
-                        ? "Justifiée"
-                        : "Non justifiée"
-                    }`
+                  ? `${PresenceDetails.absences[0].cours} – ${PresenceDetails.absences[0].justifiee
+                    ? "Justifiée"
+                    : "Non justifiée"
+                  }`
                   : "Aucune absence"}
               </p>
             </div>
