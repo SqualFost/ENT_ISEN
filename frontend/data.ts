@@ -227,12 +227,13 @@ export interface Note_temp {
   sous_matiere_id: string
   score: string
   coeff: string
+  code?: string
 }
 
 export interface SousMatiere {
   id: string
   nom: string
-  coefficient?: number
+  coefficient: number
   notes: Note_temp[]
 }
 

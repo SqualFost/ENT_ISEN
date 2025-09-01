@@ -135,6 +135,7 @@ export class UserService {
       })
     );
     const data = { id: userId, nom: userName, modules: modulesWithDetails };
+    console.log("User object:", data);
     return data;
   }
   static async createModuleForUser(userName: string, moduleName: string) {
@@ -192,7 +193,7 @@ export class UserService {
     }
     return data;
   }
- 
+
   static async createSousMatiereForMatiere(
     matiereId: number,
     sousMatiereName: string,
@@ -224,19 +225,19 @@ export class UserService {
     sousMatiereId: number,
     noteValue: number,
     coefficient: number,
-    code :string,
+    code: string,
     user_id: number,
     name: string
-  )
-  {
+  ) {
     const date = new Date();
     const { data, error } = await supabase
       .from("Notes")
-      .insert([{ valeur: noteValue, coefficient: coefficient, date: date, code: code, user_id: user_id, name: name, sous_matiere_id: sousMatiereId }])
+      .insert([{ score: noteValue, coefficient: coefficient, code: code, user_id: user_id, nom: name, sous_matiere_id: sousMatiereId }])
       .select();
     if (error) {
       throw new Error(`Error adding note: ${error.message}`);
     }
+    console.log("Note added:", data);
     return data;
   }
 }
