@@ -12,7 +12,7 @@ import {
   LoaderCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { addDays, startOfWeek, isToday, format, isSameDay } from "date-fns";
+import { addDays, startOfWeek, isToday, format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
@@ -84,7 +84,7 @@ export default function AgendaPage() {
         <Navbar />
         <Card className="text-blue-600 font-bold text-xl animate-pulse w-full flex justify-center items-center shadow-xl">
           <LoaderCircle className="h-12 w-12 mr-2 animate-spin" />
-          Chargement de l'emploi du temps...
+          Chargement de l&apos;emploi du temps...
         </Card>
       </div>
     );
@@ -121,19 +121,23 @@ export default function AgendaPage() {
                 {jours.map((jour, index) => {
                   const columnDate = getDateForColumn(index);
                   const isCurrentDay = isToday(columnDate);
-                  
+
                   return (
                     <th
                       key={jour}
                       className={`border border-gray-300 p-2 w-250 min-w-[250px] max-w-[250px] ${
-                        isCurrentDay 
-                          ? "bg-blue-100 font-bold text-blue-800" 
+                        isCurrentDay
+                          ? "bg-blue-100 font-bold text-blue-800"
                           : "bg-gray-200"
                       }`}
                     >
                       <div className="flex flex-col">
                         <span>{jour}</span>
-                        <span className={`text-sm ${isCurrentDay ? "text-blue-600" : "text-gray-600"}`}>
+                        <span
+                          className={`text-sm ${
+                            isCurrentDay ? "text-blue-600" : "text-gray-600"
+                          }`}
+                        >
                           {formatDate(columnDate)}
                         </span>
                       </div>
@@ -154,7 +158,7 @@ export default function AgendaPage() {
                   {jours.map((jour, jourIndex) => {
                     const columnDate = getDateForColumn(jourIndex);
                     const isCurrentDay = isToday(columnDate);
-                    
+
                     // Vérifie si un cours commence à cette heure précise
                     const coursCell = planning.find(
                       (c) =>
@@ -191,11 +195,13 @@ export default function AgendaPage() {
                         rowSpan={coursCell ? coursCell.duree || 1 : 1}
                       >
                         {coursCell ? (
-                          <div className={`rounded-sm px-2 py-1 text-xs text-center shadow w-full h-full flex flex-col justify-center overflow-hidden ${
-                            isCurrentDay 
-                              ? "bg-blue-600 text-white" 
-                              : "bg-blue-500 text-white"
-                          }`}>
+                          <div
+                            className={`rounded-sm px-2 py-1 text-xs text-center shadow w-full h-full flex flex-col justify-center overflow-hidden ${
+                              isCurrentDay
+                                ? "bg-blue-600 text-white"
+                                : "bg-blue-500 text-white"
+                            }`}
+                          >
                             <div className="font-semibold break-words mx-7">
                               {coursCell.matiere}
                             </div>

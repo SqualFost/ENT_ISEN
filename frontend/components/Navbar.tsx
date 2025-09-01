@@ -55,34 +55,44 @@ export default function Navbar() {
     fetchInfos();
   }, []);
   return (
-    <Card className="w-64 flex flex-col h-full max-h-screen">
+    <Card className="w-full lg:w-64 h-auto lg:h-full max-h-screen top-0 left-0 sticky lg:static flex flex-col z-12">
       <CardHeader className="border-b">
-        <h1 className="text-xl font-bold text-[var(--rouge-isen)]">
+        <h1 className="text-xl font-bold text-[var(--rouge-isen)] justify-center flex sm:flex-row">
           ISEN Yncrea
         </h1>
       </CardHeader>
 
       {/* Centre scrollable */}
       <div className="flex-1 overflow-y-auto">
-        <CardContent className="py-6 px-0">
-          <ul className="space-y-2 px-4">
+        <CardContent className="lg:py-6 px-0 flex flex-row lg:flex-col justify-center">
+          <ul className="lg:space-y-2 px-4 flex flex-row lg:flex-col">
             {liens.map((link) => (
               <li key={link.label}>
                 <a
                   href={link.href}
-                  className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-background transition-colors"
+                  className="flex items-center space-x-3 px-2 lg:px-4 lg:py-3 rounded-lg hover:bg-background transition-colors "
                 >
                   <link.icon size={20} />
-                  <span>{link.label}</span>
+                  <span className="hidden lg:block">{link.label}</span>
                 </a>
               </li>
             ))}
+
+            <li className="lg:hidden">
+              <button
+                onClick={handleLogout}
+                className="flex items-center space-x-3 px-2 lg:px-4 lg:py-3 rounded-lg hover:bg-background transition-colors text-red-500 hover:text-red-700"
+              >
+                <LogOut size={20} />
+                <span className="hidden lg:block">Déconnexion</span>
+              </button>
+            </li>
           </ul>
         </CardContent>
       </div>
 
       {/* Footer toujours collé en bas */}
-      <CardFooter className="p-4 border-t flex flex-col gap-2">
+      <CardFooter className="p-4 border-t flex-col gap-2 hidden lg:flex">
         <div className="flex items-center space-x-3 px-4 pt-3 w-full">
           <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
             <User size={16} className="text-white" />
