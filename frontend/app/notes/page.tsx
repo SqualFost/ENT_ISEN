@@ -5,8 +5,11 @@ import type { Module, Note, Note_temp } from "../../data"
 import { modulesData, notesNonAssignees } from "../../data"
 import { ModuleCard } from "@/components/ModuleCard"
 import { UnassignedNotes } from "@/components/UnassignedNotes"
+import { UserService } from "../supabase/user/user"
+import { User } from "lucide-react"
 
 export default function NotesPage() {
+
   const [modules, setModules] = useState<Module[]>(modulesData)
   const [notesEnAttente, setNotesEnAttente] = useState<Note_temp[]>(notesNonAssignees)
 
