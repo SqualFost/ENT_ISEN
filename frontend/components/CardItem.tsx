@@ -48,10 +48,10 @@ export default function CardItem({
           onClick={clicOverlay}
         >
           <Card
-            className="w-full max-w-3xl relative"
+            className="relative min-w-[500px] max-w-[95vw] px-4 py-3"
             onClick={(e) => e.stopPropagation()}
           >
-            <CardHeader className="flex justify-between items-center">
+            <CardHeader className="flex justify-between items-center border-b">
               <h2 className="text-xl font-bold">{title}</h2>
               <button
                 className="text-gray-500 hover:text-gray-700"
@@ -60,7 +60,9 @@ export default function CardItem({
                 <X size={20} />
               </button>
             </CardHeader>
-            <CardContent>{contenuEtendu || children}</CardContent>
+            <CardContent className="whitespace-nowrap">
+              {contenuEtendu || children}
+            </CardContent>
           </Card>
         </div>
       )}

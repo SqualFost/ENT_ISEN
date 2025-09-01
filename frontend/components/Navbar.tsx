@@ -55,7 +55,7 @@ export default function Navbar() {
     fetchInfos();
   }, []);
   return (
-    <Card className="w-full lg:w-64 h-auto lg:h-full max-h-screen top-0 left-0 sticky lg:static flex flex-col z-12">
+    <Card className="w-full lg:w-64 h-auto lg:h-full max-h-screen top-0 left-0 sticky lg:static flex flex-col z-2">
       <CardHeader className="border-b">
         <h1 className="text-xl font-bold text-[var(--rouge-isen)] justify-center flex sm:flex-row">
           ISEN Yncrea
@@ -101,7 +101,7 @@ export default function Navbar() {
             {infos === null ? (
               <div className="flex flex-col gap-1">
                 <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-3 w-48" />
+                <Skeleton className="h-3 w-32" />
               </div>
             ) : (
               <>
