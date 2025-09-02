@@ -9,6 +9,7 @@ import { Clock } from "lucide-react";
 export default function PresenceDetails() {
   const [loadingAbcences, setLoadingAbcences] = useState(true);
   const [PresenceDetails, setAbsences] = useState<Presence | null>(null);
+  
   useEffect(() => {
     const fetchAbsences = async () => {
       const result = await loadAbscences();
@@ -17,12 +18,13 @@ export default function PresenceDetails() {
     };
     fetchAbsences();
   }, []);
+  
   return (
     <CardItem
       className="lg:col-span-1 md:col-span-2 col-span-1 row-span-2"
       title="Présence"
       contenuEtendu={
-        PresenceDetails && Array.isArray(PresenceDetails.absences) ? (
+        PresenceDetails && Array.isArray(PresenceDetails.absences) && PresenceDetails.absences.length > 0 ? (
           <div className="space-y-2">
             {PresenceDetails.absences.map((absence, index) => (
               <div
@@ -102,19 +104,19 @@ export default function PresenceDetails() {
             <div className="flex items-center justify-between text-xs">
               <span className="text-gray-800">Absences justifiées</span>
               <span className="font-medium text-gray-800">
-                {PresenceDetails.absencesJustifiees}
+                {PresenceDetails.absencesJustifiees || 0}
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-gray-800">Absences non justifiées</span>
               <span className="font-medium text-destructive">
-                {PresenceDetails.absencesNonJustifiees}
+                {PresenceDetails.absencesNonJustifiees || 0}
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-gray-800">Retards</span>
               <span className="font-medium text-gray-800">
-                {PresenceDetails.retards}
+                {PresenceDetails.retards || 0}
               </span>
             </div>
           </div>
