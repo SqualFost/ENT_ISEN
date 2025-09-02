@@ -33,8 +33,15 @@ const heures = [
 // Convertit un "date" de l'API → jour en toutes lettres
 function getJourLabel(dateStr: string): string {
   const d = new Date(dateStr);
-  const dayIndex = d.getDay(); // 0 = Dimanche, 1 = Lundi ...
-  return jours[dayIndex - 1] || "";
+  let dayIndex = d.getDay(); // 0 = Dimanche, 1 = Lundi ...
+  if (dayIndex === 0) dayIndex = 7;
+  return jours[dayIndex - 1];
+}
+
+// Convertit "HH:MM" en minutes
+function toMinutes(time: string): number {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
 }
 
 export default function AgendaPage() {
@@ -50,6 +57,7 @@ export default function AgendaPage() {
       const startTimestamp = startWeek.getTime();
       const endTimestamp = addDays(startWeek, 6).setHours(23, 59, 59, 999);
       const result = await fetchEDTApi(startTimestamp, endTimestamp);
+      console.log("EDT fetched:", result);
       setPlanning(result || []);
       setLoadingEDT(false);
     };
@@ -58,22 +66,18 @@ export default function AgendaPage() {
 
   function changerSemaine(semaineOffset: number, intensite: number) {
     if (intensite === 30) {
-      // Aller au début du mois précédent/suivant
       const nouvelleDate = new Date(startWeek);
       nouvelleDate.setMonth(nouvelleDate.getMonth() + semaineOffset);
       setStartWeek(startOfWeek(nouvelleDate, { weekStartsOn: 1 }));
     } else {
-      // Aller à la semaine précédente/suivante
       setStartWeek((prev) => addDays(prev, semaineOffset * 7));
     }
   }
 
-  // Fonction pour obtenir la date correspondant à chaque colonne de jour
   const getDateForColumn = (jourIndex: number): Date => {
     return addDays(startWeek, jourIndex);
   };
 
-  // Fonction pour formater la date
   const formatDate = (date: Date): string => {
     return format(date, "dd/MM", { locale: fr });
   };
@@ -112,7 +116,7 @@ export default function AgendaPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="overflow-x-auto">
-          <table className="border-collapse border border-gray-300 w-full text-center">
+          <table className="border-collapse border border-gray-300 w-full text-center relative">
             <thead>
               <tr>
                 <th className="bg-gray-200 border border-gray-300 p-2 w-[100px]">
@@ -148,71 +152,75 @@ export default function AgendaPage() {
             </thead>
             <tbody>
               {heures.map((heure, i) => (
-                <tr key={heure}>
-                  {/* Colonne Heure */}
+                <tr key={heure} className="relative">
                   <td className="bg-gray-100 border border-gray-300 p-2 font-medium w-[100px]">
                     {heure}
                   </td>
 
-                  {/* Colonnes jours */}
                   {jours.map((jour, jourIndex) => {
                     const columnDate = getDateForColumn(jourIndex);
                     const isCurrentDay = isToday(columnDate);
+                    const heureMinutes = toMinutes(heure);
 
-                    // Vérifie si un cours commence à cette heure précise
-                    const coursCell = planning.find(
-                      (c) =>
-                        getJourLabel(c.date) === jour &&
-                        c.heure.startsWith(heure)
+                    // tous les cours du jour
+                    const coursDuJour = planning.filter(
+                      (c) => getJourLabel(c.date) === jour
                     );
 
-                    // Vérifie si la case est couverte par un cours déjà affiché
-                    const coursEnCours = planning.find((c) => {
-                      if (getJourLabel(c.date) !== jour) return false;
-
-                      const startIndex = heures.indexOf(c.heure.split("-")[0]);
-                      const endIndex = startIndex + (c.duree || 1) - 1;
-
-                      return i > startIndex && i <= endIndex;
+                    // cours qui commence dans cette heure
+                    const coursDansCellule = coursDuJour.filter((c) => {
+                      const [startTime] = c.heure.split("-");
+                      const start = toMinutes(startTime);
+                      return start >= heureMinutes && start < heureMinutes + 60;
                     });
-
-                    if (coursEnCours && !coursCell) {
-                      // La case est dans la plage d'un cours déjà rendu → on saute
-                      return null;
-                    }
 
                     return (
                       <td
                         key={jour + heure}
-                        className={`border border-gray-300 h-16 ${
-                          isCurrentDay ? "bg-blue-50" : ""
-                        }`}
+                        className={`border border-gray-300 relative h-20`}
                         style={{
                           width: "250px",
                           minWidth: "250px",
                           maxWidth: "250px",
+                          backgroundColor: isCurrentDay ? "#f0f9ff" : "transparent",
                         }}
-                        rowSpan={coursCell ? coursCell.duree || 1 : 1}
                       >
-                        {coursCell ? (
-                          <div
-                            className={`rounded-sm px-2 py-1 text-xs text-center shadow w-full h-full flex flex-col justify-center overflow-hidden ${
-                              isCurrentDay
-                                ? "bg-blue-600 text-white"
-                                : "bg-blue-500 text-white"
-                            }`}
-                          >
-                            <div className="font-semibold break-words mx-7">
-                              {coursCell.matiere}
-                            </div>
-                            <div className="text-[10px] opacity-70 truncate">
-                              {coursCell.salle}
-                            </div>
-                            <div className="text-[10px] opacity-70 truncate">
-                              {coursCell.heure}
-                            </div>
-                          </div>
-                        ) : null}
+                        <div className="relative h-full w-full">
+                          {coursDansCellule.map((c, idx) => {
+                            const [startTime, endTime] = c.heure.split("-");
+                            const start = toMinutes(startTime);
+                            const end = toMinutes(endTime);
+
+                            const offset = (start - heureMinutes) / 60; // 0 ou 0.5
+                            const dureeHeure = (end - start) / 60;
+
+                            return (
+                              <div
+                                key={idx}
+                                className={`absolute left-1 right-1 rounded-sm px-2 py-1 text-xs text-center shadow overflow-hidden ${
+                                  isCurrentDay
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-blue-500 text-white"
+                                }`}
+                                style={{
+                                  top: `${offset * 100}%`,
+                                  height: `${dureeHeure * 100}%`,
+                                  zIndex: 10, // Assure que le contenu est au-dessus du fond
+                                }}
+                              >
+                                <div className="font-semibold break-words">
+                                  {c.matiere}
+                                </div>
+                                <div className="text-[10px] opacity-70 truncate">
+                                  {c.salle}
+                                </div>
+                                <div className="text-[10px] opacity-70 truncate">
+                                  {c.heure}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </td>
                     );
                   })}
