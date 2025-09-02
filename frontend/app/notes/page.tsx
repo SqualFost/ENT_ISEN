@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { Module, Note, Note_temp } from "../../data"
 import { modulesData, notesNonAssignees } from "../../data"
 import { ModuleCard } from "@/components/ModuleCard"
@@ -12,17 +12,7 @@ export default function NotesPage() {
 
   const [modules, setModules] = useState<Module[]>(modulesData)
   const [notesEnAttente, setNotesEnAttente] = useState<Note_temp[]>(notesNonAssignees)
-  //test user service
-  UserService.createUser("Anthony.C");
-  UserService.createModuleForUser("Anthony.C", "Module de Test");
-  UserService.getAllModules("Anthony.C").then((modules) => {
-    console.log("Modules for Anthony.C:", modules);
-  });
-  UserService.createMatiereForModule(76, "Matiere de Test", 2);
-  UserService.createSousMatiereForMatiere(21, "Sous-Matiere de Test", 1);
-  UserService.addNoteToSousMatiere(55, 15,2,"25_ISEN" ,45,"TP-exam");
-  UserService.addNoteToSousMatiere(55, 20,1,"25_ISEN" ,50,"CC");
-  UserService.getUserObject("Anthony.C");
+
   const assignerNote = (noteIndex: number, moduleId: string, matiereId: string, sousMatiereId: string) => {
     console.log("[v0] assignerNote called with:", { noteIndex, moduleId, matiereId, sousMatiereId })
 
