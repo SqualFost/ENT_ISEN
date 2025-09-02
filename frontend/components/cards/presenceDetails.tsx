@@ -125,21 +125,18 @@ export default function PresenceDetails() {
             <div className="flex items-center gap-2">
               <Clock size={12} className={classes.icon} />
               <span className={`text-xs ${classes.textMain}`}>
-                Dernière absences:{" "}
+                Dernière absence:{" "}
                 {PresenceDetails?.absences?.[0]
-                  ? `${PresenceDetails.absences[0].date} ${
-                      PresenceDetails.absences[0].heure || ""
-                    }`
-                  : "Aucune absences"}
+                  ? `${PresenceDetails.absences[0].date || ""} ${PresenceDetails.absences[0].heure || ""}`
+                  : "Aucune absence"}
               </span>
             </div>
             <p className={`text-xs mt-1 ${classes.textSub}`}>
-              {PresenceDetails.absences.length > 0
-                ? `${PresenceDetails.absences[0].cours} – ${
-                    PresenceDetails.absences[0].justifiee
-                      ? "Justifiée"
-                      : "Non justifiée"
-                  }`
+              {PresenceDetails?.absences?.[0]
+                ? `${PresenceDetails.absences[0].cours || "Cours inconnu"} – ${PresenceDetails.absences[0].justifiee
+                  ? "Justifiée"
+                  : "Non justifiée"
+                }`
                 : "Aucune absence"}
             </p>
           </div>
