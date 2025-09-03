@@ -42,7 +42,7 @@ export function DateStrToTimeStamp(dateStr: string): number {
   // Retourne le timestamp
   return date.getTime();
 }
-import type { Note_temp, SousMatiere, Matiere, Note } from "../data.ts"
+import type { Note_temp, SousMatiere, Matiere } from "../data.ts"
 
 export function calculerMoyenneSousMatiere(notes: Note_temp[]): number {
   if (notes.length === 0) return 0

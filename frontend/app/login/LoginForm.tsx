@@ -22,9 +22,6 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [error, setError] = useState("");
-  function isNumericString(str: string): boolean {
-    return /^[0-9]+$/.test(str);
-  }
   // simulation de login attendant que l'api marche et que l'ent soit pas cassé encore
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

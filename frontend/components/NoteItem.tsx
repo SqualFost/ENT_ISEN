@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge"
-import type { Note, Note_temp } from "../data"
+import type { Note_temp } from "../data"
 import { getCouleurNote } from "@/lib/utils"
 
 interface NoteItemProps {

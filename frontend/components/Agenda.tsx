@@ -1,6 +1,6 @@
 "use client";
 import { Cours } from "@/data";
-import { isToday, format, addDays, startOfWeek } from "date-fns";
+import { isToday, format, addDays } from "date-fns";
 import { fr } from "date-fns/locale";
 
 const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
@@ -91,7 +91,7 @@ export default function Agenda({ planning, startWeek, loading = false }: AgendaP
         </tr>
       </thead>
       <tbody>
-        {heures.map((heure, i) => (
+        {heures.map((heure) => (
           <tr key={heure} className="relative">
             <td className="bg-gray-100 border border-gray-300 p-2 font-medium w-[100px]">
               {heure}

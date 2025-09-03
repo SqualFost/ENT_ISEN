@@ -9,16 +9,11 @@ import Agenda from "./../Agenda";
 
 const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 
-function getJourLabel(dateStr: string): string {
-  const d = new Date(dateStr);
-  const dayIndex = d.getDay(); // 0 = Dimanche, 1 = Lundi ...
-  return jours[dayIndex - 1] || "";
-}
 
 export default function EmploiDuTemps() {
   const [loadingEDT, setLoadingEDT] = useState(true);
   const [planning, setPlanning] = useState<Cours[]>([]);
-  const [startWeek, setStartWeek] = useState(() =>
+  const [startWeek] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
 

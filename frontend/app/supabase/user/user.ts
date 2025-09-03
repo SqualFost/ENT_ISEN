@@ -1,5 +1,6 @@
 // UserService.ts
 import { supabase } from "../db";
+import type { PostgrestError } from "@supabase/supabase-js";
 
 // ——— Types de lignes (facultatif mais recommandé pour TS) ———
 export type UserRow = { id: number; nom: string; created_at?: string };
@@ -50,7 +51,7 @@ export class UserService {
 
     // PGRST116 = no rows found
     if (error) {
-      if ((error as any).code === "PGRST116") return null;
+      if ((error as PostgrestError).code === "PGRST116") return null;
       throw new Error(`Error fetching user: ${error.message}`);
     }
 
