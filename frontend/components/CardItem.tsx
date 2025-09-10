@@ -48,7 +48,7 @@ export default function CardItem({
           onClick={clicOverlay}
         >
           <Card
-            className="relative min-w-[500px] max-w-[95vw] px-4 py-3"
+            className="relative min-w-[350px] max-w-[95vw] px-4 py-3"
             onClick={(e) => e.stopPropagation()}
           >
             <CardHeader className="flex justify-between items-center border-b">

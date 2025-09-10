@@ -30,7 +30,7 @@ function getJourLabel(dateStr: string): string {
 export default function EmploiDuTemps() {
   const [loadingEDT, setLoadingEDT] = useState(true);
   const [planning, setPlanning] = useState<Cours[]>([]);
-  const [startWeek, setStartWeek] = useState(() =>
+  const [startWeek] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
 

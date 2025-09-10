@@ -110,6 +110,8 @@ export async function loadAbscences() {
       retards: 0, // Assuming no retards data available
       absences: absences,
     };
+
+    console.log("yooo " + PresenceDetails.absences);
     sessionStorage.setItem("absences-cache", JSON.stringify(PresenceDetails));
     return PresenceDetails;
   } catch (error) {
@@ -125,7 +127,10 @@ export async function loadAbscences() {
   }
 }
 // Appel API brut et parsing
-export async function fetchEDTApi(start: number, end: number): Promise<Cours[]> {
+export async function fetchEDTApi(
+  start: number,
+  end: number
+): Promise<Cours[]> {
   try {
     const response = await api.getAgenda(start, end);
     const planning: Cours[] = [];
@@ -138,14 +143,15 @@ export async function fetchEDTApi(start: number, end: number): Promise<Cours[]> 
           matiere: title[2] + " " + title[3],
           salle: title[6],
           isExam: item.className === "est-epreuve",
-          isEvent: item.className !== "est-epreuve" &&
+          isEvent:
+            item.className !== "est-epreuve" &&
             item.className !== "CM" &&
             item.className !== "TD" &&
             item.className !== "TP",
           date: item.start.split("T")[0],
           prof: "",
           jour: "",
-          duree: getDureeFromHeure(title[0] + "-" + title[1])
+          duree: getDureeFromHeure(title[0] + "-" + title[1]),
         });
       } else {
         planning.push({
@@ -154,14 +160,15 @@ export async function fetchEDTApi(start: number, end: number): Promise<Cours[]> 
           salle: title[5],
           isPause: false,
           isExam: item.className === "est-epreuve",
-          isEvent: item.className !== "est-epreuve" &&
+          isEvent:
+            item.className !== "est-epreuve" &&
             item.className !== "CM" &&
             item.className !== "TD" &&
             item.className !== "TP",
           date: item.start.split("T")[0],
           prof: "",
           jour: "",
-          duree: getDureeFromHeure(title[0] + "-" + title[1])
+          duree: getDureeFromHeure(title[0] + "-" + title[1]),
         });
       }
     }
@@ -180,7 +187,7 @@ export async function fetchEDTApi(start: number, end: number): Promise<Cours[]> 
       date: "",
       prof: "",
       jour: "",
-      duree: 0
+      duree: 0,
     };
 
     return [errorCours];
@@ -194,7 +201,10 @@ export async function loadEDTDay(): Promise<Cours[]> {
     now.getFullYear(),
     now.getMonth(),
     now.getDate(),
-    0, 0, 0, 0
+    0,
+    0,
+    0,
+    0
   ).getTime();
 
   // Aujourd’hui à 23h59:59.999
@@ -202,7 +212,10 @@ export async function loadEDTDay(): Promise<Cours[]> {
     now.getFullYear(),
     now.getMonth(),
     now.getDate(),
-    23, 59, 59, 999
+    23,
+    59,
+    59,
+    999
   ).getTime();
 
   return await fetchEDTApi(startOfDay, endOfDay);
@@ -382,7 +395,7 @@ export async function setEdtForAgenda() {
               date: coursActuel.date,
               prof: "",
               jour: "",
-              duree: getDureeFromHeure(finActuel + "-" + debutSuivant)
+              duree: getDureeFromHeure(finActuel + "-" + debutSuivant),
             };
             journee.cours.push(pause);
           }
@@ -409,7 +422,7 @@ export async function setEdtForAgenda() {
       date: "",
       prof: "",
       jour: "",
-      duree: 0
+      duree: 0,
     };
 
     console.error("Failed to load EDT data:", error);
@@ -443,7 +456,7 @@ export async function setEvent() {
       date: "",
       prof: "",
       jour: "",
-      duree: 0
+      duree: 0,
     };
 
     console.error("Failed to load EDT data:", error);
@@ -471,7 +484,6 @@ function getDureeFromHeure(heure: string): number {
   const [start, end] = heure.split("-");
   const [startHour, startMinute] = start.split(":").map(Number);
   const [endHour, endMinute] = end.split(":").map(Number);
-
 
   let duree = endHour - startHour;
   if (endMinute < startMinute) {

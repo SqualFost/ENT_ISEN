@@ -8,11 +8,11 @@ import { Clock } from "lucide-react";
 
 export default function PresenceDetails() {
   const [loadingAbcences, setLoadingAbcences] = useState(true);
-  const [PresenceDetails, setAbsences] = useState<Presence | null>(null);
+  const [PresenceDetails, setPresenceDetails] = useState<Presence | null>(null);
   useEffect(() => {
     const fetchAbsences = async () => {
       const result = await loadAbscences();
-      setAbsences(result || null);
+      setPresenceDetails(result || null);
       setLoadingAbcences(false);
     };
     fetchAbsences();
@@ -22,7 +22,7 @@ export default function PresenceDetails() {
       className="lg:col-span-1 md:col-span-2 col-span-1 row-span-2"
       title="Présence"
       contenuEtendu={
-        PresenceDetails && Array.isArray(PresenceDetails.absences) ? (
+        PresenceDetails?.absences && PresenceDetails.absences.length > 0 ? (
           <div className="space-y-2">
             {PresenceDetails.absences.map((absence, index) => (
               <div
@@ -43,13 +43,10 @@ export default function PresenceDetails() {
             ))}
           </div>
         ) : (
-          <div
-            className={`${classes.bg} p-2 rounded border-l-4 ${classes.border}`}
-          >
+          <div className={"items-center"}>
             <div className="flex items-center gap-2">
-              <Clock size={12} className={classes.icon} />
-              <span className={`text-xs ${classes.textMain}`}>
-                Aucune absence
+              <span className={`text-xs `}>
+                Vous n&apos;avez aucune absence pour le moment.
               </span>
             </div>
           </div>
@@ -130,7 +127,7 @@ export default function PresenceDetails() {
                   ? `${PresenceDetails.absences[0].date} ${
                       PresenceDetails.absences[0].heure || ""
                     }`
-                  : "Aucune absences"}
+                  : ""}
               </span>
             </div>
             <p className={`text-xs mt-1 ${classes.textSub}`}>
