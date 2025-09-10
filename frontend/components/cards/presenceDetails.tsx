@@ -17,6 +17,7 @@ export default function PresenceDetails() {
     };
     fetchAbsences();
   }, []);
+
   return (
     <CardItem
       className="lg:col-span-1 md:col-span-2 col-span-1 row-span-2"
@@ -99,19 +100,19 @@ export default function PresenceDetails() {
             <div className="flex items-center justify-between text-xs">
               <span className="text-gray-800">Absences justifiées</span>
               <span className="font-medium text-gray-800">
-                {PresenceDetails.absencesJustifiees}
+                {PresenceDetails.absencesJustifiees || 0}
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-gray-800">Absences non justifiées</span>
               <span className="font-medium text-destructive">
-                {PresenceDetails.absencesNonJustifiees}
+                {PresenceDetails.absencesNonJustifiees || 0}
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-gray-800">Retards</span>
               <span className="font-medium text-gray-800">
-                {PresenceDetails.retards}
+                {PresenceDetails.retards || 0}
               </span>
             </div>
           </div>
@@ -122,7 +123,7 @@ export default function PresenceDetails() {
             <div className="flex items-center gap-2">
               <Clock size={12} className={classes.icon} />
               <span className={`text-xs ${classes.textMain}`}>
-                Dernière absences:{" "}
+                Dernière absence:{" "}
                 {PresenceDetails?.absences?.[0]
                   ? `${PresenceDetails.absences[0].date} ${
                       PresenceDetails.absences[0].heure || ""
@@ -131,8 +132,8 @@ export default function PresenceDetails() {
               </span>
             </div>
             <p className={`text-xs mt-1 ${classes.textSub}`}>
-              {PresenceDetails.absences.length > 0
-                ? `${PresenceDetails.absences[0].cours} – ${
+              {PresenceDetails?.absences?.[0]
+                ? `${PresenceDetails.absences[0].cours || "Cours inconnu"} – ${
                     PresenceDetails.absences[0].justifiee
                       ? "Justifiée"
                       : "Non justifiée"

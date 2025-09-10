@@ -12,30 +12,8 @@ import {
   LoaderCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { addDays, startOfWeek, isToday, format } from "date-fns";
-import { fr } from "date-fns/locale";
-
-const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
-const heures = [
-  "08:00",
-  "09:00",
-  "10:00",
-  "11:00",
-  "12:00",
-  "13:00",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-  "18:00",
-];
-
-// Convertit un "date" de l'API → jour en toutes lettres
-function getJourLabel(dateStr: string): string {
-  const d = new Date(dateStr);
-  const dayIndex = d.getDay(); // 0 = Dimanche, 1 = Lundi ...
-  return jours[dayIndex - 1] || "";
-}
+import { addDays, startOfWeek } from "date-fns";
+import Agenda from "@/components/Agenda";
 
 export default function AgendaPage() {
   const [loadingEDT, setLoadingEDT] = useState(true);
@@ -50,6 +28,7 @@ export default function AgendaPage() {
       const startTimestamp = startWeek.getTime();
       const endTimestamp = addDays(startWeek, 6).setHours(23, 59, 59, 999);
       const result = await fetchEDTApi(startTimestamp, endTimestamp);
+      console.log("EDT fetched:", result);
       setPlanning(result || []);
       setLoadingEDT(false);
     };
@@ -58,25 +37,13 @@ export default function AgendaPage() {
 
   function changerSemaine(semaineOffset: number, intensite: number) {
     if (intensite === 30) {
-      // Aller au début du mois précédent/suivant
       const nouvelleDate = new Date(startWeek);
       nouvelleDate.setMonth(nouvelleDate.getMonth() + semaineOffset);
       setStartWeek(startOfWeek(nouvelleDate, { weekStartsOn: 1 }));
     } else {
-      // Aller à la semaine précédente/suivante
       setStartWeek((prev) => addDays(prev, semaineOffset * 7));
     }
   }
-
-  // Fonction pour obtenir la date correspondant à chaque colonne de jour
-  const getDateForColumn = (jourIndex: number): Date => {
-    return addDays(startWeek, jourIndex);
-  };
-
-  // Fonction pour formater la date
-  const formatDate = (date: Date): string => {
-    return format(date, "dd/MM", { locale: fr });
-  };
 
   if (loadingEDT) {
     return (
@@ -112,114 +79,7 @@ export default function AgendaPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="overflow-x-auto">
-          <table className="border-collapse border border-gray-300 w-full text-center">
-            <thead>
-              <tr>
-                <th className="bg-gray-200 border border-gray-300 p-2 w-[100px]">
-                  Heure
-                </th>
-                {jours.map((jour, index) => {
-                  const columnDate = getDateForColumn(index);
-                  const isCurrentDay = isToday(columnDate);
-
-                  return (
-                    <th
-                      key={jour}
-                      className={`border border-gray-300 p-2 w-250 min-w-[250px] max-w-[250px] ${
-                        isCurrentDay
-                          ? "bg-blue-100 font-bold text-blue-800"
-                          : "bg-gray-200"
-                      }`}
-                    >
-                      <div className="flex flex-col">
-                        <span>{jour}</span>
-                        <span
-                          className={`text-sm ${
-                            isCurrentDay ? "text-blue-600" : "text-gray-600"
-                          }`}
-                        >
-                          {formatDate(columnDate)}
-                        </span>
-                      </div>
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              {heures.map((heure, i) => (
-                <tr key={heure}>
-                  {/* Colonne Heure */}
-                  <td className="bg-gray-100 border border-gray-300 p-2 font-medium w-[100px]">
-                    {heure}
-                  </td>
-
-                  {/* Colonnes jours */}
-                  {jours.map((jour, jourIndex) => {
-                    const columnDate = getDateForColumn(jourIndex);
-                    const isCurrentDay = isToday(columnDate);
-
-                    // Vérifie si un cours commence à cette heure précise
-                    const coursCell = planning.find(
-                      (c) =>
-                        getJourLabel(c.date) === jour &&
-                        c.heure.startsWith(heure)
-                    );
-
-                    // Vérifie si la case est couverte par un cours déjà affiché
-                    const coursEnCours = planning.find((c) => {
-                      if (getJourLabel(c.date) !== jour) return false;
-
-                      const startIndex = heures.indexOf(c.heure.split("-")[0]);
-                      const endIndex = startIndex + (c.duree || 1) - 1;
-
-                      return i > startIndex && i <= endIndex;
-                    });
-
-                    if (coursEnCours && !coursCell) {
-                      // La case est dans la plage d'un cours déjà rendu → on saute
-                      return null;
-                    }
-
-                    return (
-                      <td
-                        key={jour + heure}
-                        className={`border border-gray-300 h-16 ${
-                          isCurrentDay ? "bg-blue-50" : ""
-                        }`}
-                        style={{
-                          width: "250px",
-                          minWidth: "250px",
-                          maxWidth: "250px",
-                        }}
-                        rowSpan={coursCell ? coursCell.duree || 1 : 1}
-                      >
-                        {coursCell ? (
-                          <div
-                            className={`rounded-sm px-2 py-1 text-xs text-center shadow w-full h-full flex flex-col justify-center overflow-hidden ${
-                              isCurrentDay
-                                ? "bg-blue-600 text-white"
-                                : "bg-blue-500 text-white"
-                            }`}
-                          >
-                            <div className="font-semibold break-words mx-7">
-                              {coursCell.matiere}
-                            </div>
-                            <div className="text-[10px] opacity-70 truncate">
-                              {coursCell.salle}
-                            </div>
-                            <div className="text-[10px] opacity-70 truncate">
-                              {coursCell.heure}
-                            </div>
-                          </div>
-                        ) : null}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Agenda planning={planning} startWeek={startWeek} loading={loadingEDT} />
         </CardContent>
       </Card>
     </div>

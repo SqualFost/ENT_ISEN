@@ -1,12 +1,14 @@
 "use client"
 
-import { useState } from "react"
-import type { Module, Note, Note_temp } from "../../data"
+import {  useState } from "react"
+import type { Module, Note_temp } from "../../data"
 import { modulesData, notesNonAssignees } from "../../data"
 import { ModuleCard } from "@/components/ModuleCard"
 import { UnassignedNotes } from "@/components/UnassignedNotes"
 
+
 export default function NotesPage() {
+
   const [modules, setModules] = useState<Module[]>(modulesData)
   const [notesEnAttente, setNotesEnAttente] = useState<Note_temp[]>(notesNonAssignees)
 
